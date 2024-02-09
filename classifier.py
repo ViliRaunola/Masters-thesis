@@ -12,6 +12,71 @@ _REPO_NAME = "./model"
 _MODEL_FOLDER = "model"
 
 
+################# Public Functions #################
+def create_finbert():
+    try:
+        if len(os.listdir(_MODEL_FOLDER)) != 0:
+            print(
+                f"The folder {_MODEL_FOLDER} is not empty. Please clear it before training the model"
+            )
+            return 0
+    except FileNotFoundError:
+        _create_folder_for_model()
+
+    tokenizer = _load_tokenizer()
+    dataset_fin_sentiment = _prepare_fin_sentiment()
+    data_sets_splits = _split_dataset(dataset_fin_sentiment)
+
+    #!TODO needed?
+    # np.unique(data_sets_splits["train"]["label"])
+    # print(np.unique(data_sets_splits["train"]["label"]))
+
+    #!TODO can be removed, jsut for checking how the data looks
+    for i in range(10):
+        print("text:", data_sets_splits["train"]["text"][i])
+        print("label:", data_sets_splits["train"]["label"][i])
+
+    tokenized_dataset = _tokenize_dataset(data_sets_splits, tokenizer)
+
+    data_collator = transformers.DataCollatorWithPadding(tokenizer=tokenizer)
+
+    trainer = _train_fin_bert(
+        tokenized_dataset=tokenized_dataset,
+        tokenizer=tokenizer,
+        data_collator=data_collator,
+        repo_name=_REPO_NAME,
+    )
+    trainer.save_model(_REPO_NAME)
+
+    _test_trained_model(trainer, tokenized_dataset)
+    print(
+        f"Creating the FinBERT model with FinSentiment data has been succesfull. The model has been saved to {_REPO_NAME}"
+    )
+
+
+def get_sentiment_pipeline():
+    if os.path.isdir(_REPO_NAME):
+        if not os.listdir(_REPO_NAME):
+            print(
+                f"The folder: {_REPO_NAME} is empty. This suggests that the model has not been trained yet. Please tain it before accessing it."
+            )
+            return None
+        else:
+            sentiment_model = _load_model()
+            tokenizer = _load_tokenizer()
+
+            sentiment_pipeline = transformers.pipeline(
+                task="text-classification", model=sentiment_model, tokenizer=tokenizer
+            )
+            return sentiment_pipeline
+    else:
+        print(
+            f"The folder: {_REPO_NAME} doesn't exist. This suggests that the model has not been trained yet. Please tain it before accessing it."
+        )
+        return None
+
+
+################# Private Functions #################
 def _load_fin_bert():
     model = transformers.AutoModelForSequenceClassification.from_pretrained(
         "TurkuNLP/bert-base-finnish-cased-v1", num_labels=3
@@ -211,46 +276,6 @@ def _create_folder_for_model():
         os.makedirs(final_directory)
 
 
-def create_finbert():
-    # try:
-    _create_folder_for_model()
-    tokenizer = _load_tokenizer()
-    dataset_fin_sentiment = _prepare_fin_sentiment()
-    data_sets_splits = _split_dataset(dataset_fin_sentiment)
-
-    #!TODO needed?
-    # np.unique(data_sets_splits["train"]["label"])
-    # print(np.unique(data_sets_splits["train"]["label"]))
-
-    #!TODO can be removed, jsut for checking how the data looks
-    for i in range(10):
-        print("text:", data_sets_splits["train"]["text"][i])
-        print("label:", data_sets_splits["train"]["label"][i])
-
-    tokenized_dataset = _tokenize_dataset(data_sets_splits, tokenizer)
-
-    data_collator = transformers.DataCollatorWithPadding(tokenizer=tokenizer)
-
-    trainer = _train_fin_bert(
-        tokenized_dataset=tokenized_dataset,
-        tokenizer=tokenizer,
-        data_collator=data_collator,
-        repo_name=_REPO_NAME,
-    )
-    trainer.save_model(_REPO_NAME)
-
-    _test_trained_model(trainer, tokenized_dataset)
-    print(
-        f"Creating the FinBERT model with FinSentiment data has been succesfull. The model has been saved to {_REPO_NAME}"
-    )
-
-
-# except:
-#     print(
-#         "An error happened during the creation of the FinBERT model with FinSentiment data"
-#     )
-
-
 # Source: https://medium.com/@rakeshrajpurohit/customized-evaluation-metrics-with-hugging-face-trainer-3ff00d936f99
 def _compute_metrics(pred):
     labels = pred.label_ids
@@ -265,28 +290,6 @@ def _compute_metrics(pred):
     f1 = f1_score(labels, preds, average="weighted")
 
     return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
-
-
-def get_sentiment_pipeline():
-    if os.path.isdir(_REPO_NAME):
-        if not os.listdir(_REPO_NAME):
-            print(
-                f"The folder: {_REPO_NAME} is empty. This suggests that the model has not been trained yet. Please tain it before accessing it."
-            )
-            return None
-        else:
-            sentiment_model = _load_model()
-            tokenizer = _load_tokenizer()
-
-            sentiment_pipeline = transformers.pipeline(
-                task="text-classification", model=sentiment_model, tokenizer=tokenizer
-            )
-            return sentiment_pipeline
-    else:
-        print(
-            f"The folder: {_REPO_NAME} doesn't exist. This suggests that the model has not been trained yet. Please tain it before accessing it."
-        )
-        return None
 
 
 def _load_model():
