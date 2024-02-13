@@ -26,6 +26,7 @@ def test_ner_pipeline(ner_pipeline):
         [
             "Tässä lauseessa kerrotaan, että Vilin syntymäpäivä on 19.06.1997",
             "Twitter on ollut vuosia ihan paska...",
+            "Pakko antaa kyllä u/Pontus_Pilates :lle propsit käyttäjänimestä, ansaitsi nenä tuhahduksen",
         ]
     )
 
