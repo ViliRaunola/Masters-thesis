@@ -1,18 +1,18 @@
 import re
 
 
-def remove_url(text):
+def remove_url(text: str):
     regex_pattern = re.compile(pattern="https?:[^\s]+")
     return regex_pattern.sub(r"", text)
 
 
-def remove_reddit_quotation(text):
+def remove_reddit_quotation(text: str):
     regex_pattern = re.compile(pattern="\s*(?=>)(?!\s*>)|^>")
     return regex_pattern.sub(r"", text)
 
 
 # Source: https://gist.github.com/slowkow/7a7f61f495e3dbb7e3d767f97bd7304b
-def remove_emojis(text):
+def remove_emojis(text: str):
     regrex_pattern = re.compile(
         pattern="["
         "\u231A-\u231B"
