@@ -1,42 +1,35 @@
+import classifier
 import common
+import menu
+import tagger
 
 
-def test_pipeline(sentiment_pipeline):
-    test_sentenses = [
-        "Tämä ML teknologia on aivan uskomatonta!",
-        "Voi kunpa mieki osaisin koodata :D.",
-        "Tämä lause on tosi vitun paska ja negaatiivinen, kys!",
-        "Positiivinen lause.",
-        "Mikään ei onnistu.",
-    ]
-
-    results = sentiment_pipeline(test_sentenses)
-    print("The results from testing:")
-    for index, sentense in enumerate(test_sentenses):
-        print(sentense)
-        print(results[index])
-        print("\n\n")
-
-
-def test_ner_pipeline(ner_pipeline):
-    tulos = ner_pipeline(
-        [
-            "Tässä lauseessa kerrotaan, että Vilin syntymäpäivä on 19.06.1997",
-            "Twitter on ollut vuosia ihan paska...",
-            "Pakko antaa kyllä u/Pontus_Pilates :lle propsit käyttäjänimestä, ansaitsi nenä tuhahduksen",
-        ]
-    )
-
-    for i in tulos:
-        for j in i:
-            print(j)
-        print("\n")
-
-
-class tools:
+class Tools:
     def __init__(self, sentiment_pipeline, ner_pipeline):
         self.sentiment_pipeline = sentiment_pipeline
         self.ner_pipeline = ner_pipeline
+
+
+def check_model_folders():
+    """
+    Check if the folders are created.
+    Returns true if both folders exist.
+    """
+
+    is_ner_trained = common.check_folder_ner()
+    is_class_trained = common.check_folder_class()
+
+    if is_class_trained & is_ner_trained:
+        return True
+    if not is_ner_trained:
+        print(
+            f"{common.colors.CYELLOW}Ner folder doesn't exist or is empty. Please train the model first.{common.colors.CEND}"
+        )
+    if not is_class_trained:
+        print(
+            f"{common.colors.CYELLOW}Classifier folder doesn't exist or is empty. Please train the model first.{common.colors.CEND}"
+        )
+    return False
 
 
 def main():
@@ -44,22 +37,20 @@ def main():
     print("Hello World!")
 
     while True:
-        is_ner_trained = common.check_folder_ner()
-        is_class_trained = common.check_folder_class()
-
-        if is_class_trained & is_ner_trained:
+        if check_model_folders():
             break
-        if not is_ner_trained:
-            print(
-                f"{common.colors.CYELLOW}Ner folder doesn't exist or is empty. Please train the model first.{common.colors.CEND}"
-            )
-        if not is_class_trained:
-            print(
-                f"{common.colors.CYELLOW}Classifier folder doesn't exist or is empty. Please train the model first.{common.colors.CEND}"
-            )
 
-        userinput = common.print_start_menu()
-        common.switch_start(userinput)
+        userinput = menu.start_menu()
+        menu.switch_start(userinput)
+
+    tools = Tools(classifier.get_sentiment_pipeline(), tagger.get_ner_pipeline())
+
+    common.test_ner_pipeline(tools.ner_pipeline)
+    common.test_pipeline(tools.sentiment_pipeline)
+
+    while True:
+        userinput = menu.main_menu()
+        menu.switch_main(userinput)
 
     # classifier.create_finbert()
     # tagger.create_ner_finbert()
