@@ -7,6 +7,8 @@ import torch
 import transformers
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
+import common
+
 # Private globals
 _REPO_NAME = "./model"
 _MODEL_FOLDER = "model"
@@ -14,12 +16,16 @@ _MODEL_FOLDER = "model"
 
 ################# Public Functions #################
 def create_finbert():
+    """
+    Return 1 for failed attempt, 0 for success
+    """
+
     try:
         if len(os.listdir(_MODEL_FOLDER)) != 0:
             print(
-                f"The folder {_MODEL_FOLDER} is not empty. Please clear it before training the model"
+                f"{common.colors.CYELLOW} The folder {_MODEL_FOLDER} is not empty. Please clear it before training the model {common.colors.CEND}"
             )
-            return 0
+            return 1
     except FileNotFoundError:
         _create_folder_for_model()
 
@@ -50,15 +56,16 @@ def create_finbert():
 
     _test_trained_model(trainer, tokenized_dataset)
     print(
-        f"Creating the FinBERT model with FinSentiment data has been succesfull. The model has been saved to {_REPO_NAME}"
+        f"{common.colors.CGREEN}Creating the FinBERT model with FinSentiment data has been succesfull. The model has been saved to {_REPO_NAME}{common.colors.CEND}"
     )
+    return 0
 
 
 def get_sentiment_pipeline():
     if os.path.isdir(_REPO_NAME):
         if not os.listdir(_REPO_NAME):
             print(
-                f"The folder: {_REPO_NAME} is empty. This suggests that the model has not been trained yet. Please tain it before accessing it."
+                f"{common.colors.CYELLOW}The folder: {_REPO_NAME} is empty. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
             )
             return None
         else:
@@ -71,7 +78,7 @@ def get_sentiment_pipeline():
             return sentiment_pipeline
     else:
         print(
-            f"The folder: {_REPO_NAME} doesn't exist. This suggests that the model has not been trained yet. Please tain it before accessing it."
+            f"{common.colors.CYELLOW}The folder: {_REPO_NAME} doesn't exist. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
         )
         return None
 
