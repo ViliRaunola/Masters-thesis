@@ -1,56 +1,32 @@
-import classifier
 import common
 import menu
-import tagger
-
-
-class Tools:
-    def __init__(self, sentiment_pipeline, ner_pipeline):
-        self.sentiment_pipeline = sentiment_pipeline
-        self.ner_pipeline = ner_pipeline
-
-
-def check_model_folders():
-    """
-    Check if the folders are created.
-    Returns true if both folders exist.
-    """
-
-    is_ner_trained = common.check_folder_ner()
-    is_class_trained = common.check_folder_class()
-
-    if is_class_trained & is_ner_trained:
-        return True
-    if not is_ner_trained:
-        print(
-            f"{common.colors.CYELLOW}Ner folder doesn't exist or is empty. Please train the model first.{common.colors.CEND}"
-        )
-    if not is_class_trained:
-        print(
-            f"{common.colors.CYELLOW}Classifier folder doesn't exist or is empty. Please train the model first.{common.colors.CEND}"
-        )
-    return False
+import reddit
 
 
 def main():
 
     print("Hello World!")
 
+    # Let user train the models
     while True:
-        if check_model_folders():
+        if common.check_model_folders():
             break
 
         userinput = menu.start_menu()
         menu.switch_start(userinput)
 
-    tools = Tools(classifier.get_sentiment_pipeline(), tagger.get_ner_pipeline())
+    nlp_tools = common.load_pipelines()
+    prawn_connection = reddit.create_praw_instance()
 
-    common.test_ner_pipeline(tools.ner_pipeline)
-    common.test_pipeline(tools.sentiment_pipeline)
+    # common.test_ner_pipeline(tools.ner_pipeline)
+    # common.test_pipeline(tools.sentiment_pipeline)
 
+    # Let user to use the main functionalities
     while True:
         userinput = menu.main_menu()
-        menu.switch_main(userinput)
+        menu.switch_main(
+            input=userinput, prawn_connection=prawn_connection, nlp_tools=nlp_tools
+        )
 
     # classifier.create_finbert()
     # tagger.create_ner_finbert()

@@ -1,6 +1,11 @@
+from typing import Type
+
+from praw import Reddit
+
 import classifier
+import reddit
 import tagger
-from common import colors, exit_program
+from common import NlpTools, colors, exit_program
 
 MENU_BORDER_SIZE = 40
 
@@ -24,7 +29,7 @@ def start_menu():
     """
     print(menu)
 
-    userinput = input("Your selection: ")
+    userinput = input(">: ")
     return userinput
 
 
@@ -43,24 +48,24 @@ def main_menu():
         """
     print(menu)
 
-    userinput = input("Your selection: ")
+    userinput = input(">: ")
     return userinput
 
 
-def switch_main(input):
+def switch_main(input: str, prawn_connection: Type[Reddit], nlp_tools: Type[NlpTools]):
     """
     Selecting the operation to execute based on user input of the main menu
     """
 
     if input == "1":
-        print("doin reddit stuff")
+        reddit.start_reddit_analyzer(nlp_tools=nlp_tools, reddit=prawn_connection)
     elif input == "0":
         exit_program()
     else:
         print(f"{colors.CYELLOW}Unknown input, try again{colors.CEND}")
 
 
-def switch_start(input):
+def switch_start(input: str):
     """
     Selecting the operation to execute based on user input of the first menu
     """

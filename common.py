@@ -1,8 +1,26 @@
 import os
 import sys
+from typing import Type
+
+from transformers import Pipeline
+
+import classifier
+import tagger
 
 _REPO_NAME_CLASS = "./model"
 _REPO_NAME_NER = "./model_ner"
+
+
+class NlpTools:
+    """
+    Used to store the loaded pipelines
+    """
+
+    def __init__(
+        self, sentiment_pipeline: Type[Pipeline], ner_pipeline: Type[Pipeline]
+    ):
+        self.sentiment_pipeline = sentiment_pipeline
+        self.ner_pipeline = ner_pipeline
 
 
 class colors:
@@ -49,6 +67,27 @@ class colors:
     CVIOLETBG2 = "\33[105m"
     CBEIGEBG2 = "\33[106m"
     CWHITEBG2 = "\33[107m"
+
+
+def load_pipelines():
+    """
+    Loads the sentiment analysis and the named entity
+    recognition pipeline to Tools class instance and returns it.
+    """
+
+    print(f"{colors.CBLINK2}Loading the models...{colors.CEND}")
+
+    try:
+        nlp_tools = NlpTools(
+            classifier.get_sentiment_pipeline(), tagger.get_ner_pipeline()
+        )
+    except:
+        print(f"{colors.CRED}Error while loading the pipelines!{colors.CEND}")
+        exit_program("Exited in loading the pipelines")
+
+    print(f"{colors.CGREEN}Pipelines are loaded and ready to use{colors.CEND}")
+
+    return nlp_tools
 
 
 def test_pipeline(sentiment_pipeline):
@@ -105,11 +144,41 @@ def check_folder_class():
     return True
 
 
-def exit_program():
+def check_model_folders():
+    """
+    Check if the folders are created.
+    Returns true if both folders exist.
+    """
+
+    is_ner_trained = check_folder_ner()
+    is_class_trained = check_folder_class()
+
+    if is_class_trained & is_ner_trained:
+        return True
+    if not is_ner_trained:
+        print(
+            f"{colors.CYELLOW}Ner folder doesn't exist or is empty. Please train the model first.{colors.CEND}"
+        )
+    if not is_class_trained:
+        print(
+            f"{colors.CYELLOW}Classifier folder doesn't exist or is empty. Please train the model first.{colors.CEND}"
+        )
+    return False
+
+
+def exit_program(exit_message=None):
+    """
+    Exiting the program. If exit_message is provided,
+    this message is displayed instead of the default exit message.
+    """
+
     message = f"""
     {colors.CBLINK2}Exiting...{colors.CEND}
     {colors.CBLUE}Thank you for using the program!{colors.CEND}
     """
-    print(message)
 
-    sys.exit()
+    if exit_message is None:
+        print(message)
+        sys.exit()
+    else:
+        sys.exit(exit_message)
