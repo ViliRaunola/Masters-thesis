@@ -10,6 +10,8 @@ import tagger
 _REPO_NAME_CLASS = "./model"
 _REPO_NAME_NER = "./model_ner"
 
+CLASSIFIER_LABELS = ["neg", "neut", "pos"]
+
 
 class NlpTools:
     """

@@ -36,14 +36,18 @@ def start_menu():
 def main_menu():
     """
     Prints menu and returns the user input
-    1 - analyze reddit post
+    1 - analyze reddit full
+    2 - post only
+    3 - post + root comments
     0 - exit
     """
     menu = f"""
         {"-" * MENU_BORDER_SIZE}
         | Please select the next operation:
         | 0) exit
-        | 1) analyse reddit post
+        | 1) analyse reddit post, root comments and comment replies (full)
+        | 2) analyse reddit post
+        | 3) analyse reddit post and root comments
         {"-" * MENU_BORDER_SIZE}
         """
     print(menu)
@@ -58,7 +62,13 @@ def switch_main(input: str, prawn_connection: Type[Reddit], nlp_tools: Type[NlpT
     """
 
     if input == "1":
-        reddit.start_reddit_analyzer(nlp_tools=nlp_tools, reddit=prawn_connection)
+        reddit.start_reddit_analyzer_full(nlp_tools=nlp_tools, reddit=prawn_connection)
+    elif input == "2":
+        reddit.start_reddit_analyzer_post(nlp_tools=nlp_tools, reddit=prawn_connection)
+    elif input == "3":
+        reddit.start_reddit_analyzer_post_root_comments(
+            nlp_tools=nlp_tools, reddit=prawn_connection
+        )
     elif input == "0":
         exit_program()
     else:

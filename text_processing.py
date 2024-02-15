@@ -11,7 +11,7 @@ def remove_reddit_quotation(text: str):
     return regex_pattern.sub(r"", text)
 
 
-# Source: https://gist.github.com/slowkow/7a7f61f495e3dbb7e3d767f97bd7304b
+# Source: https://stackoverflow.com/questions/33404752/removing-emojis-from-a-string-in-python
 def remove_emojis(text: str):
     regrex_pattern = re.compile(
         pattern="["
