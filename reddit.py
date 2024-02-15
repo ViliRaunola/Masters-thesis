@@ -100,7 +100,6 @@ def _root_comment_analysis(
 
 def _recursion_on_comments(
     comment,
-    depth: int,
     result_list: list,
     nlp_tools: Type[NlpTools],
 ):
@@ -108,7 +107,6 @@ def _recursion_on_comments(
     Preprocesses the comment's body then does the sentiment analysis.
     If the comment has replies, calls the function recursively
     """
-    depth += 1
 
     if comment.body:
         # Pre processing the text data
@@ -124,23 +122,24 @@ def _recursion_on_comments(
     if comment.replies:
         for reply in comment.replies:
             _recursion_on_comments(
-                comment=reply, depth=depth, result_list=result_list, nlp_tools=nlp_tools
+                comment=reply, result_list=result_list, nlp_tools=nlp_tools
             )
 
 
-def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
-    depth = 0
-    root_comment_children_sentiments = []
-    root_comment_tags_list = []
-    root_comment_afer_preprocessing = []
-    total_comments_sentiment = {"neg": 0, "neut": 0, "pos": 0}
+def _analyse_root_and_replies(
+    post: Type[praw.Reddit.submission],
+    root_comment_after_preprocessing: list,
+    root_comment_tags_list: list,
+    root_comment_children_sentiments: list,
+    nlp_tools: Type[NlpTools],
+):
     for index, comment in enumerate(post.comments):
 
         # Root comment analysis
         comment_text = text_processing.remove_emojis(comment.body)
         comment_text = text_processing.remove_url(comment_text)
         comment_text = text_processing.remove_reddit_quotation(comment_text)
-        root_comment_afer_preprocessing.append(comment_text)
+        root_comment_after_preprocessing.append(comment_text)
         comment_sentiment = nlp_tools.sentiment_pipeline(comment_text)[0]
 
         # Save result of root comment analysis
@@ -155,11 +154,22 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
         for relply in comment.replies:
             _recursion_on_comments(
                 comment=relply,
-                depth=depth,
                 result_list=root_comment_children_sentiments[index],
                 nlp_tools=nlp_tools,
             )
+    return (
+        root_comment_after_preprocessing,
+        root_comment_tags_list,
+        root_comment_children_sentiments,
+    )
 
+
+def _print_root_comment_results(
+    total_comments_sentiment: dict,
+    root_comment_children_sentiments: list,
+    root_comment_tags_list: list,
+    root_comment_after_preprocessing: list,
+):
     header = [
         "Label",
         "Score",
@@ -194,7 +204,7 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
                 counter["neg"],
                 counter["neut"],
                 counter["pos"],
-                root_comment_afer_preprocessing[index],
+                root_comment_after_preprocessing[index],
             ]
         )
 
@@ -203,6 +213,8 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
     )
     print(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
 
+
+def _print_all_replies_sentiment(total_comments_sentiment: dict):
     header = [
         "# of neg replies",
         "# of neut replies",
@@ -219,9 +231,32 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
     print(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
 
 
-def _print_counter_results(counter: Type[Counter]):
-    for label, value in counter.items():
-        print("{:<40}".format(f"Number of {label} comments:"), value)
+def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
+    root_comment_children_sentiments = []
+    root_comment_tags_list = []
+    root_comment_after_preprocessing = []
+    total_comments_sentiment = {"neg": 0, "neut": 0, "pos": 0}
+
+    (
+        root_comment_after_preprocessing,
+        root_comment_tags_list,
+        root_comment_children_sentiments,
+    ) = _analyse_root_and_replies(
+        post=post,
+        root_comment_after_preprocessing=root_comment_after_preprocessing,
+        root_comment_tags_list=root_comment_tags_list,
+        nlp_tools=nlp_tools,
+        root_comment_children_sentiments=root_comment_children_sentiments,
+    )
+
+    _print_root_comment_results(
+        total_comments_sentiment=total_comments_sentiment,
+        root_comment_after_preprocessing=root_comment_after_preprocessing,
+        root_comment_children_sentiments=root_comment_children_sentiments,
+        root_comment_tags_list=root_comment_tags_list,
+    )
+
+    _print_all_replies_sentiment(total_comments_sentiment=total_comments_sentiment)
 
 
 def start_reddit_analyzer_post(nlp_tools: Type[NlpTools], reddit: Type[praw.Reddit]):
@@ -286,8 +321,6 @@ def start_reddit_analyzer_full(nlp_tools: Type[NlpTools], reddit: Type[praw.Redd
     title = text_processing.remove_url(title)
     _title_sentiment_analysis(title=title, nlp_tools=nlp_tools)
     _post_sentiment_analysis(post=post.selftext, nlp_tools=nlp_tools)
-    # _root_comment_analysis(nlp_tools=nlp_tools, post=post)
     _sentiment_analysis_all_comments(post=post, nlp_tools=nlp_tools)
 
-    #!TODO Add sentiment analysis for comments, and sub comments
     #!TODO Add the ner tagging, combine the results somehow... maybe use the text highlight

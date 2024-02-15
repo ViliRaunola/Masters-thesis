@@ -20,12 +20,12 @@ def start_menu():
     """
 
     menu = f"""
-    {"-" * MENU_BORDER_SIZE}
-    | You need to have neural networks created on your machine before analyzing posts.
-    | 0 - exit the program
-    | 1 - train NER model
-    | 2 - train classifier model
-    {"-" * MENU_BORDER_SIZE}
+{"-" * MENU_BORDER_SIZE}
+| You need to have neural networks created on your machine before analyzing posts.
+| 0 - exit the program
+| 1 - train NER model
+| 2 - train classifier model
+{"-" * MENU_BORDER_SIZE}
     """
     print(menu)
 
@@ -41,14 +41,15 @@ def main_menu():
     3 - post + root comments
     0 - exit
     """
+
     menu = f"""
-        {"-" * MENU_BORDER_SIZE}
-        | Please select the next operation:
-        | 0) exit
-        | 1) analyse reddit post, root comments and comment replies (full)
-        | 2) analyse reddit post
-        | 3) analyse reddit post and root comments
-        {"-" * MENU_BORDER_SIZE}
+{"-" * MENU_BORDER_SIZE}
+| Please select the next operation:
+| 0) exit
+| 1) analyse reddit post
+| 2) analyse reddit post and root comments
+| 3) analyse reddit post, root comments and comment replies (full)
+{"-" * MENU_BORDER_SIZE}
         """
     print(menu)
 
@@ -62,13 +63,13 @@ def switch_main(input: str, prawn_connection: Type[Reddit], nlp_tools: Type[NlpT
     """
 
     if input == "1":
-        reddit.start_reddit_analyzer_full(nlp_tools=nlp_tools, reddit=prawn_connection)
-    elif input == "2":
         reddit.start_reddit_analyzer_post(nlp_tools=nlp_tools, reddit=prawn_connection)
-    elif input == "3":
+    elif input == "2":
         reddit.start_reddit_analyzer_post_root_comments(
             nlp_tools=nlp_tools, reddit=prawn_connection
         )
+    elif input == "3":
+        reddit.start_reddit_analyzer_full(nlp_tools=nlp_tools, reddit=prawn_connection)
     elif input == "0":
         exit_program()
     else:
