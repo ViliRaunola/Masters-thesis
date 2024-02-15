@@ -6,3 +6,4 @@ model_ner
 model
 logs
 __pycache__
+testing.py

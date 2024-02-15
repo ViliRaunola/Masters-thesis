@@ -44,6 +44,16 @@ def _title_sentiment_analysis(nlp_tools: Type[NlpTools], title: str):
     print("Score: {:.5}".format(title_sentiment["score"]))
 
 
+def _root_comment_analysis(
+    nlp_tools: Type[NlpTools], post: Type[praw.Reddit.submission]
+):
+    for comment in post.comments:
+        comment_text = text_processing.remove_emojis(comment.body)
+        comment_text = text_processing.remove_url(comment_text)
+        comment_text = text_processing.remove_reddit_quotation(comment_text)
+        print(comment_text)
+
+
 def start_reddit_analyzer(nlp_tools: Type[NlpTools], reddit: Type[praw.Reddit]):
 
     while True:
@@ -62,6 +72,9 @@ def start_reddit_analyzer(nlp_tools: Type[NlpTools], reddit: Type[praw.Reddit]):
     title = text_processing.remove_emojis(title)
     title = text_processing.remove_url(title)
     _title_sentiment_analysis(title=title, nlp_tools=nlp_tools)
+
+    #!TODO Add sentiment analysis for comments, and sub comments
+    #!TODO Add the ner tagging, combine the results somehow... maybe use the text highlight
 
 
 # reddit = create_praw_instance()
