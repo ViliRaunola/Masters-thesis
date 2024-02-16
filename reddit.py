@@ -289,6 +289,55 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
     _print_all_replies_sentiment(total_comments_sentiment=total_comments_sentiment)
 
 
+def _unpack_ner_results(results: list):
+    parsed_results = {
+        "PERSON": [],
+        "LOC": [],
+        "ORG": [],
+        "PRODUCT": [],
+        "EVENT": [],
+        "DATE": [],
+    }
+    print(parsed_results)
+    enitity_count = 0
+    for result in results:
+        if result["entity"][0] == "B":
+            enitity_count = 1
+            for tag in parsed_results:
+                if tag == result["entity"][2:]:
+                    list_to_append = parsed_results[tag]
+                    temp = {"word": result["word"], "score": result["score"]}
+                    list_to_append.append(temp)
+        elif result["entity"][0] == "I":
+            enitity_count += 1
+            list_to_append[-1]["word"] = (
+                list_to_append[-1]["word"] + " " + result["word"]
+            )
+            # Calculating the average score of the words
+            list_to_append[-1]["score"] = (
+                list_to_append[-1]["score"] + result["score"]
+            ) / enitity_count
+
+    return parsed_results
+
+
+def _print_ner_results(results: dict):
+    header = ["Label", "Score", "Word"]
+    rows = []
+    for tag in results:
+        for list_values in results[tag]:
+            rows.append([tag, list_values["score"], list_values["word"]])
+
+    print(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
+
+
+def _text_ner_analysis(nlp_tools: Type[NlpTools], text: str, title_ner_results: list):
+    results = nlp_tools.ner_pipeline(text)
+    unpacked_results = _unpack_ner_results(results)
+
+    _print_ner_results(unpacked_results)
+
+
 def start_reddit_analyzer_post(nlp_tools: Type[NlpTools], reddit: Type[praw.Reddit]):
     while True:
         try:
@@ -307,8 +356,26 @@ def start_reddit_analyzer_post(nlp_tools: Type[NlpTools], reddit: Type[praw.Redd
     title = text_processing.remove_url(title)
     title = text_processing.remove_deleted_and_removed_tags(title)
     title = text_processing.remove_new_lines(title)
+
+    post_text = post.selftext
+    post_text = text_processing.remove_emojis(post_text)
+    post_text = text_processing.remove_url(post_text)
+    post_text = text_processing.remove_deleted_and_removed_tags(post_text)
+    post_text = text_processing.remove_new_lines(post_text)
+
     _title_sentiment_analysis(title=title, nlp_tools=nlp_tools)
-    _post_sentiment_analysis(post=post.selftext, nlp_tools=nlp_tools)
+    title_ner_results = []
+
+    print(f"\n{colors.CBLUEBG}Identified labels from Title{colors.CEND}")
+    _text_ner_analysis(
+        nlp_tools=nlp_tools, text=title, title_ner_results=title_ner_results
+    )
+
+    _post_sentiment_analysis(post=post_text, nlp_tools=nlp_tools)
+    print(f"\n{colors.CBLUEBG}Identified labels from Post's body{colors.CEND}")
+    _text_ner_analysis(
+        nlp_tools=nlp_tools, text=post_text, title_ner_results=title_ner_results
+    )
 
 
 def start_reddit_analyzer_post_root_comments(
