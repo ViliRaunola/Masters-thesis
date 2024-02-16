@@ -1,4 +1,5 @@
 import os
+from typing import Type
 
 import datasets
 import numpy as np
@@ -29,7 +30,7 @@ def create_finbert():
     except FileNotFoundError:
         _create_folder_for_model()
 
-    tokenizer = _load_tokenizer()
+    tokenizer = load_tokenizer()
     dataset_fin_sentiment = _prepare_fin_sentiment()
     data_sets_splits = _split_dataset(dataset_fin_sentiment)
 
@@ -69,8 +70,8 @@ def get_sentiment_pipeline():
             )
             return None
         else:
-            sentiment_model = _load_model()
-            tokenizer = _load_tokenizer()
+            sentiment_model = load_model()
+            tokenizer = load_tokenizer()
 
             sentiment_pipeline = transformers.pipeline(
                 task="text-classification", model=sentiment_model, tokenizer=tokenizer
@@ -95,11 +96,18 @@ def _load_fin_bert():
     return model
 
 
-def _load_tokenizer():
+def load_tokenizer():
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         "TurkuNLP/bert-base-finnish-cased-v1"
     )
+
     return tokenizer
+
+
+def tokenize_long_text(text: str, tokenizer: Type[transformers.AutoTokenizer]):
+    tokens = tokenizer.encode_plus(text, add_special_tokens=False, return_tensors="pt")
+    print(tokens)
+    return tokens
 
 
 def _read_fin_sentiment():
@@ -299,9 +307,68 @@ def _compute_metrics(pred):
     return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
 
 
-def _load_model():
+def load_model():
     id2label = {0: "neg", 1: "neut", 2: "pos"}
     sentiment_model = transformers.AutoModelForSequenceClassification.from_pretrained(
         _REPO_NAME, id2label=id2label
     )
     return sentiment_model
+
+
+def get_long_text_classifier():
+    return _long_text_classifier
+
+
+def _long_text_classifier(text: str):
+    tokenizer = load_tokenizer()
+    tokens = tokenize_long_text(text, tokenizer)
+
+    input_id_chunks = tokens["input_ids"][0].split(510)
+    mask_chunks = tokens["attention_mask"][0].split(510)
+
+    chunksize = 512
+
+    input_id_chunks = list(input_id_chunks)
+    mask_chunks = list(mask_chunks)
+
+    input_ids, attention_mask = _split_tokens_into_chunks(
+        input_id_chunks, mask_chunks, chunksize
+    )
+
+    input_dict = {"input_ids": input_ids.long(), "attention_mask": attention_mask.int()}
+
+    model = load_model()
+
+    outputs = model(**input_dict)
+    probs = torch.nn.functional.softmax(outputs[0], dim=-1)
+    mean = probs.mean(dim=0)
+
+    label_id = torch.argmax(mean).item()
+    id2label = {0: "neg", 1: "neut", 2: "pos"}
+
+    return {"label": f"{id2label[label_id]}", "score": mean.detach().numpy()[label_id]}
+
+
+def _split_tokens_into_chunks(input_id_chunks: list, mask_chunks: list, chunksize: int):
+    #!The CLC is 102 and SEP is 103!!!
+    for i in range(len(input_id_chunks)):
+        input_id_chunks[i] = torch.cat(
+            [torch.Tensor([102]), input_id_chunks[i], torch.Tensor([103])]
+        )
+
+        mask_chunks[i] = torch.cat(
+            [torch.Tensor([1]), mask_chunks[i], torch.Tensor([1])]
+        )
+
+        # Making sure that if it is less than 512 it gets filled with 0s
+        pad_len = chunksize - input_id_chunks[i].shape[0]
+        if pad_len > 0:
+            input_id_chunks[i] = torch.cat(
+                [input_id_chunks[i], torch.Tensor([0] * pad_len)]
+            )
+            mask_chunks[i] = torch.cat([mask_chunks[i], torch.Tensor([0] * pad_len)])
+
+    input_ids = torch.stack(input_id_chunks)
+    attention_mask = torch.stack(mask_chunks)
+
+    return input_ids, attention_mask

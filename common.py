@@ -19,10 +19,14 @@ class NlpTools:
     """
 
     def __init__(
-        self, sentiment_pipeline: Type[Pipeline], ner_pipeline: Type[Pipeline]
+        self,
+        sentiment_pipeline: Type[Pipeline],
+        ner_pipeline: Type[Pipeline],
+        sentiment_pipeline_long: callable,
     ):
         self.sentiment_pipeline = sentiment_pipeline
         self.ner_pipeline = ner_pipeline
+        self.sentiment_pipeline_long = sentiment_pipeline_long
 
 
 class colors:
@@ -81,7 +85,9 @@ def load_pipelines():
 
     try:
         nlp_tools = NlpTools(
-            classifier.get_sentiment_pipeline(), tagger.get_ner_pipeline()
+            classifier.get_sentiment_pipeline(),
+            tagger.get_ner_pipeline(),
+            classifier.get_long_text_classifier(),
         )
     except:
         print(f"{colors.CRED}Error while loading the pipelines!{colors.CEND}")
