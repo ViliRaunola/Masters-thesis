@@ -320,6 +320,7 @@ def get_long_text_classifier():
 
 
 def _long_text_classifier(text: str):
+
     tokenizer = load_tokenizer()
     tokens = tokenize_long_text(text, tokenizer)
 

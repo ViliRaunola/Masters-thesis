@@ -11,6 +11,16 @@ def remove_reddit_quotation(text: str):
     return regex_pattern.sub(r"", text)
 
 
+def remove_deleted_and_removed_tags(text: str):
+    regex_pattern = re.compile(pattern="\[(deleted|removed)\]")
+    return regex_pattern.sub(r"", text)
+
+
+def remove_new_lines(text: str):
+    regex_pattern = re.compile(pattern="[\r\n]+")
+    return regex_pattern.sub(r"", text)
+
+
 # Source: https://stackoverflow.com/questions/33404752/removing-emojis-from-a-string-in-python
 # / https://stackoverflow.com/questions/69554621/remove-emoji-from-string-doesnt-works-for-some-cases
 def remove_emojis(text: str):

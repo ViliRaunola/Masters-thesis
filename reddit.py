@@ -40,7 +40,12 @@ def _get_reddit_post_url():
 
 
 def _title_sentiment_analysis(nlp_tools: Type[NlpTools], title: str):
-    title_sentiment = nlp_tools.sentiment_pipeline(title)[0]
+    try:
+        title_sentiment = nlp_tools.sentiment_pipeline(title)[0]
+    except RuntimeError as err:
+        print(err)
+        print("using the version for longer inputs")
+        title_sentiment = nlp_tools.sentiment_pipeline_long(title)
     header = ["Label", "Score", "Title after processing"]
     rows = [[title_sentiment["label"], title_sentiment["score"], title]]
     print("\n")
@@ -49,7 +54,13 @@ def _title_sentiment_analysis(nlp_tools: Type[NlpTools], title: str):
 
 
 def _post_sentiment_analysis(nlp_tools: Type[NlpTools], post: str):
-    post_sentiment = nlp_tools.sentiment_pipeline(post)[0]
+    try:
+        post_sentiment = nlp_tools.sentiment_pipeline(post)[0]
+    except RuntimeError as err:
+        print(err)
+        print("using the version for longer inputs")
+        post_sentiment = nlp_tools.sentiment_pipeline_long(post)
+
     header = ["Label", "Score", "Post after processing"]
     rows = [[post_sentiment["label"], post_sentiment["score"], post]]
     print("\n")
@@ -75,7 +86,15 @@ def _root_comment_analysis(
         comment_text = text_processing.remove_emojis(comment.body)
         comment_text = text_processing.remove_url(comment_text)
         comment_text = text_processing.remove_reddit_quotation(comment_text)
-        comment_sentiment = nlp_tools.sentiment_pipeline(comment_text)[0]
+        comment_text = text_processing.remove_deleted_and_removed_tags(comment_text)
+        comment_text = text_processing.remove_new_lines(comment_text)
+
+        try:
+            comment_sentiment = nlp_tools.sentiment_pipeline(comment_text)[0]
+        except RuntimeError as err:
+            print(err)
+            print("using the version for longer inputs")
+            comment_sentiment = nlp_tools.sentiment_pipeline_long(post)
 
         # Save results
         tags_list.append(
@@ -108,18 +127,26 @@ def _recursion_on_comments(
     If the comment has replies, calls the function recursively
     """
 
-    if comment.body:
+    if hasattr(comment, "body"):
         # Pre processing the text data
         comment_text = text_processing.remove_emojis(comment.body)
         comment_text = text_processing.remove_url(comment_text)
         comment_text = text_processing.remove_reddit_quotation(comment_text)
+        comment_text = text_processing.remove_deleted_and_removed_tags(comment_text)
+        comment_text = text_processing.remove_new_lines(comment_text)
 
-        comment_sentiment = nlp_tools.sentiment_pipeline(comment_text)[0]
+        try:
+            comment_sentiment = nlp_tools.sentiment_pipeline(comment_text)[0]
+        except RuntimeError as err:
+            print(err)
+            print("using the version for longer inputs")
+            comment_sentiment = nlp_tools.sentiment_pipeline_long(comment_text)
+
         result_list.append(
             {"label": comment_sentiment["label"], "score": comment_sentiment["score"]}
         )
 
-    if comment.replies:
+    if hasattr(comment, "replies"):
         for reply in comment.replies:
             _recursion_on_comments(
                 comment=reply, result_list=result_list, nlp_tools=nlp_tools
@@ -139,6 +166,9 @@ def _analyse_root_and_replies(
         comment_text = text_processing.remove_emojis(comment.body)
         comment_text = text_processing.remove_url(comment_text)
         comment_text = text_processing.remove_reddit_quotation(comment_text)
+        comment_text = text_processing.remove_deleted_and_removed_tags(comment_text)
+        comment_text = text_processing.remove_new_lines(comment_text)
+
         root_comment_after_preprocessing.append(comment_text)
         comment_sentiment = nlp_tools.sentiment_pipeline(comment_text)[0]
 
@@ -275,6 +305,8 @@ def start_reddit_analyzer_post(nlp_tools: Type[NlpTools], reddit: Type[praw.Redd
     title = post.title
     title = text_processing.remove_emojis(title)
     title = text_processing.remove_url(title)
+    title = text_processing.remove_deleted_and_removed_tags(title)
+    title = text_processing.remove_new_lines(title)
     _title_sentiment_analysis(title=title, nlp_tools=nlp_tools)
     _post_sentiment_analysis(post=post.selftext, nlp_tools=nlp_tools)
 
@@ -297,6 +329,8 @@ def start_reddit_analyzer_post_root_comments(
     title = post.title
     title = text_processing.remove_emojis(title)
     title = text_processing.remove_url(title)
+    title = text_processing.remove_deleted_and_removed_tags(title)
+    title = text_processing.remove_new_lines(title)
     _title_sentiment_analysis(title=title, nlp_tools=nlp_tools)
     _post_sentiment_analysis(post=post.selftext, nlp_tools=nlp_tools)
     _root_comment_analysis(nlp_tools=nlp_tools, post=post)
@@ -319,6 +353,8 @@ def start_reddit_analyzer_full(nlp_tools: Type[NlpTools], reddit: Type[praw.Redd
     title = post.title
     title = text_processing.remove_emojis(title)
     title = text_processing.remove_url(title)
+    title = text_processing.remove_deleted_and_removed_tags(title)
+    title = text_processing.remove_new_lines(title)
     _title_sentiment_analysis(title=title, nlp_tools=nlp_tools)
     _post_sentiment_analysis(post=post.selftext, nlp_tools=nlp_tools)
     _sentiment_analysis_all_comments(post=post, nlp_tools=nlp_tools)
