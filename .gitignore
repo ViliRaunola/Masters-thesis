@@ -7,3 +7,6 @@ model
 logs
 __pycache__
 testing.py
+table.txt
+table_comments_sentiment.txt
+table_ner_tags_comments.txt

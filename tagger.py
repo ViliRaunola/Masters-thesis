@@ -27,6 +27,8 @@ _LABEL_LIST = [
     "I-EVENT",
     "B-DATE",
     "I-DATE",
+    "B-GPE",
+    "I-GPE",
 ]
 
 # Selecting the metric to use
