@@ -411,6 +411,7 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
     _most_common_ner_tags_in_results(combined_ner_results)
 
 
+#!TODO refactor to reduce complexity
 def _unpack_ner_results(results: list):
     parsed_results = {
         "PERSON": [],
@@ -499,9 +500,119 @@ def _print_ner_results(results: dict, save_to_file: bool = False):
         f.write(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
 
 
-def _most_common_ner_tags_in_results(results: dict):
-    header = ["Label", "Score", "Word"]
+def _create_data_frame_for_ner_sentiment_analysis(results: dict):
+    header = [
+        "Label",
+        "Score",
+        "Word",
+        "Context label",
+        "Context score",
+        "Context text after preprocessing",
+    ]
+    rows = []
+    #!TODO this has been done earlier, no need to compute again!
+    for tag in results:
+        for list_values in results[tag]:
+            rows.append(
+                [
+                    tag,
+                    list_values["score"],
+                    list_values["word"],
+                    list_values["context_label"],
+                    list_values["context_score"],
+                    list_values["context_text"],
+                ]
+            )
 
+    df = pd.DataFrame(data=rows, columns=header)
+    return df
+
+
+def _get_top_amount_from_each_tag(
+    tags: set, df: Type[pd.DataFrame], top_amount: int, most_common_tags: dict
+):
+    for tag in tags:
+        counts = df.loc[df["Label"] == tag]["Word"].value_counts()
+        top_ten = counts.head(top_amount)
+        most_common_tags[tag].extend(top_ten.keys())
+
+    return most_common_tags
+
+
+def _reorder_ner_tag_to_context_value(
+    most_common_tags: dict, df: Type[pd.DataFrame], tags: set
+):
+    for tag in tags:
+        most_common_tags[tag] = {value: [] for value in most_common_tags[tag]}
+
+    for tag in tags:
+        for index, row in df.iterrows():
+            for key, value in most_common_tags[tag].items():
+                if key == row["Word"]:
+                    value.append(row["Context label"])
+
+    return most_common_tags
+
+
+def _calculate_sentiment_occurances_to_ner_tags(most_common_tags: dict, tags: set):
+    results = {}
+
+    for tag in tags:
+        for key, value in most_common_tags[tag].items():
+            counter_neg = 0
+            counter_neut = 0
+            counter_pos = 0
+            for sen_label in value:
+                if sen_label == "neg":
+                    counter_neg += 1
+                elif sen_label == "neut":
+                    counter_neut += 1
+                elif sen_label == "pos":
+                    counter_pos += 1
+            results.setdefault(tag, {}).setdefault(key, {})["neg"] = counter_neg
+            results.setdefault(tag, {}).setdefault(key, {})["neut"] = counter_neut
+            results.setdefault(tag, {}).setdefault(key, {})["pos"] = counter_pos
+
+    return results
+
+
+def _write_ner_tag_with_sentiment_score_to_file(
+    top_amount: int, tags: set, results: dict
+):
+    header = ["Word", "Neg", "Neut", "Pos", "Total"]
+    rows = []
+
+    file_name = "ner_context.txt"
+
+    with open(file_name, "w", encoding="utf-8") as f:
+        f.write("")
+
+    for tag in tags:
+        if tag in results:
+            for key, values in results[tag].items():
+                rows.append(
+                    [
+                        key,
+                        values["neg"],
+                        values["neut"],
+                        values["pos"],
+                        values["neg"] + values["neut"] + values["pos"],
+                    ]
+                )
+
+            with open(file_name, "a", encoding="utf-8") as f:
+                f.write(f"The context of TOP {top_amount} most {tag} labels\n")
+                f.write(tabulate.tabulate(tabular_data=rows, headers=header))
+                f.write("\n\n")
+
+            rows.clear()
+
+    print(
+        f"The TOP {top_amount} NER tags for each category and their context sentiment has been saved to file: {colors.CBLUE}{file_name}{colors.CEND}"
+    )
+
+
+def _most_common_ner_tags_in_results(results: dict):
     tags = {
         "PERSON",
         "LOC",
@@ -512,20 +623,35 @@ def _most_common_ner_tags_in_results(results: dict):
         "GPE",
     }
 
-    rows = []
-    for tag in results:
-        for list_values in results[tag]:
-            rows.append([tag, list_values["score"], list_values["word"]])
+    top_amount = 10
 
-    df = pd.DataFrame(data=rows, columns=header)
+    df = _create_data_frame_for_ner_sentiment_analysis(results=results)
 
-    for tag in tags:
-        counts = df.loc[df["Label"] == tag]["Word"].value_counts()
-        top_ten = counts.head(10)
-        print(
-            f"\nThe TOP 10 most freaquent words for tag: {tag} identified in the comments:"
-        )
-        print(top_ten)
+    most_common_tags = {
+        "PERSON": [],
+        "LOC": [],
+        "ORG": [],
+        "PRODUCT": [],
+        "EVENT": [],
+        "DATE": [],
+        "GPE": [],
+    }
+
+    most_common_tags = _get_top_amount_from_each_tag(
+        tags=tags, most_common_tags=most_common_tags, df=df, top_amount=top_amount
+    )
+
+    most_common_tags = _reorder_ner_tag_to_context_value(
+        most_common_tags=most_common_tags, df=df, tags=tags
+    )
+
+    results = _calculate_sentiment_occurances_to_ner_tags(
+        most_common_tags=most_common_tags, tags=tags
+    )
+
+    _write_ner_tag_with_sentiment_score_to_file(
+        tags=tags, top_amount=top_amount, results=results
+    )
 
 
 def _text_ner_analysis(

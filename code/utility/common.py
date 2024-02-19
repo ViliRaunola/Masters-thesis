@@ -95,7 +95,7 @@ def load_pipelines():
             tagger.get_ner_pipeline(),
             classifier.get_long_text_classifier(),
         )
-    except:
+    except Exception:
         print(f"{colors.CRED}Error while loading the pipelines!{colors.CEND}")
         exit_program("Exited in loading the pipelines")
 
