@@ -115,8 +115,12 @@ def _root_comment_analysis(
 
     # Individual results
     header = ["Label", "Score", "Comment after preprocessing"]
-    print(f"\n{colors.CBLUEBG}Root comments{colors.CEND}")
-    print(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
+    file_name = "table_root_comments_sentiment.txt"
+    with open(file_name, "w", encoding="utf-8") as f:
+        f.write(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
+    print(
+        f"\nRoot comments sentiment analysis saved to file: {colors.CBLUE}{file_name}{colors.CEND}\n"
+    )
 
     # Results combined
     counter = _count_sent_label_occurances(tags_list)
@@ -126,7 +130,8 @@ def _root_comment_analysis(
     print(tabulate.tabulate(tabular_data=rows, headers=header))
 
     ner_results = _combine_ner_results(ner_saved)
-    _print_ner_results(ner_results)
+    _print_ner_results(ner_results, save_to_file=True)
+    _most_common_ner_tags_in_results(ner_results)
 
 
 def _combine_ner_results(ner_saved: list):
@@ -157,7 +162,11 @@ def _combine_ner_results(ner_saved: list):
 
 
 def _recursion_on_comments(
-    comment, result_list: list, nlp_tools: Type[NlpTools], ner_results_all: list
+    comment,
+    result_list: list,
+    nlp_tools: Type[NlpTools],
+    ner_results_all: list,
+    all_comments_sentiment_results: list,
 ):
     """
     Preprocesses the comment's body then does the sentiment analysis.
@@ -183,6 +192,14 @@ def _recursion_on_comments(
             {"label": comment_sentiment["label"], "score": comment_sentiment["score"]}
         )
 
+        all_comments_sentiment_results.append(
+            {
+                "label": comment_sentiment["label"],
+                "score": comment_sentiment["score"],
+                "text": comment_text,
+            }
+        )
+
         unpacked_results = _text_ner_analysis(
             nlp_tools=nlp_tools,
             text=comment_text,
@@ -197,6 +214,7 @@ def _recursion_on_comments(
                 result_list=result_list,
                 nlp_tools=nlp_tools,
                 ner_results_all=ner_results_all,
+                all_comments_sentiment_results=all_comments_sentiment_results,
             )
 
 
@@ -207,6 +225,7 @@ def _analyse_root_and_replies(
     root_comment_children_sentiments: list,
     nlp_tools: Type[NlpTools],
     ner_results_all: list,
+    all_comments_sentiment_results: list,
 ):
     for index, comment in enumerate(post.comments):
 
@@ -231,6 +250,14 @@ def _analyse_root_and_replies(
             {"label": comment_sentiment["label"], "score": comment_sentiment["score"]}
         )
 
+        all_comments_sentiment_results.append(
+            {
+                "label": comment_sentiment["label"],
+                "score": comment_sentiment["score"],
+                "text": comment_text,
+            }
+        )
+
         unpacked_results = _text_ner_analysis(
             nlp_tools=nlp_tools,
             text=comment_text,
@@ -248,12 +275,14 @@ def _analyse_root_and_replies(
                 result_list=root_comment_children_sentiments[index],
                 nlp_tools=nlp_tools,
                 ner_results_all=ner_results_all,
+                all_comments_sentiment_results=all_comments_sentiment_results,
             )
     return (
         root_comment_after_preprocessing,
         root_comment_tags_list,
         root_comment_children_sentiments,
         ner_results_all,
+        all_comments_sentiment_results,
     )
 
 
@@ -303,7 +332,7 @@ def _print_root_comment_results(
 
     file_name = "table_comments_sentiment.txt"
     print(
-        f"\n{colors.CBLUE}Post's root comment and root comment's replies are saved to file {file_name}{colors.CEND}"
+        f"\nPost's root comment and root comment's replies are saved to file: {colors.CBLUE}{file_name}{colors.CEND}"
     )
     with open(file_name, "w", encoding="utf-8") as f:
         f.write(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
@@ -332,12 +361,14 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
     root_comment_after_preprocessing = []
     ner_results_all = []
     total_comments_sentiment = {"neg": 0, "neut": 0, "pos": 0}
+    all_comments_sentiment_results = []
 
     (
         root_comment_after_preprocessing,
         root_comment_tags_list,
         root_comment_children_sentiments,
         ner_results_all,
+        all_comments_sentiment_results,
     ) = _analyse_root_and_replies(
         post=post,
         root_comment_after_preprocessing=root_comment_after_preprocessing,
@@ -345,6 +376,25 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
         nlp_tools=nlp_tools,
         root_comment_children_sentiments=root_comment_children_sentiments,
         ner_results_all=ner_results_all,
+        all_comments_sentiment_results=all_comments_sentiment_results,
+    )
+
+    # Individual results
+    header = ["Label", "Score", "Comment after preprocessing"]
+    rows = []
+    for result in all_comments_sentiment_results:
+        rows.append([result["label"], result["score"], result["text"]])
+    file_name = "table_all_comments_sentiment.txt"
+    with open(file_name, "w", encoding="utf-8") as f:
+        f.write(
+            tabulate.tabulate(
+                tabular_data=rows,
+                headers=header,
+                tablefmt="grid",
+            )
+        )
+    print(
+        f"\nAll comments sentiment analysis results saved to file: {colors.CBLUE}{file_name}{colors.CEND}\n"
     )
 
     _print_root_comment_results(
@@ -444,7 +494,7 @@ def _print_ner_results(results: dict, save_to_file: bool = False):
         return
 
     file_name = "table_ner_tags_comments.txt"
-    # Todod print to console
+    print(f"\nSaved NER results to file: {colors.CBLUE}{file_name}{colors.CEND}\n")
     with open(file_name, "w", encoding="utf-8") as f:
         f.write(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
 
