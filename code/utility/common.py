@@ -2,13 +2,12 @@ import os
 import sys
 from typing import Type
 
+import models.classifier as classifier
+import models.tagger as tagger
 from transformers import Pipeline
 
-import classifier
-import tagger
-
-_REPO_NAME_CLASS = "./model"
-_REPO_NAME_NER = "./model_ner"
+_REPO_NAME_CLASS = "./models/model"
+_REPO_NAME_NER = "./models/model_ner"
 
 CLASSIFIER_LABELS = ["neg", "neut", "pos"]
 
@@ -134,6 +133,7 @@ def check_folder_ner():
     """
     True, if folder exist and has data --> model most likely trained
     """
+    print(os.path.isdir(_REPO_NAME_NER))
     if not os.path.isdir(_REPO_NAME_NER):
         return False
     if not os.listdir(_REPO_NAME_NER):

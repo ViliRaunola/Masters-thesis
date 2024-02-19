@@ -2,10 +2,10 @@ from typing import Type
 
 from praw import Reddit
 
-import classifier
-import reddit
-import tagger
-from common import NlpTools, colors, exit_program
+import analyzer.reddit as reddit
+import models.classifier as classifier
+import models.tagger as tagger
+from utility.common import NlpTools, colors, exit_program
 
 MENU_BORDER_SIZE = 40
 

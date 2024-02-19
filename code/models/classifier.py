@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Type
 
 import datasets
@@ -6,13 +7,12 @@ import numpy as np
 import pandas as pd
 import torch
 import transformers
+import utility.common as common
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-import common
-
 # Private globals
-_REPO_NAME = "./model"
-_MODEL_FOLDER = "model"
+_REPO_NAME = "./models/model"
+_MODEL_FOLDER = "/models/model"
 
 
 ################# Public Functions #################
@@ -112,7 +112,7 @@ def tokenize_long_text(text: str, tokenizer: Type[transformers.AutoTokenizer]):
 
 def _read_fin_sentiment():
     fin_sentiment = pd.read_csv(
-        "data/finsen-v1-1-src/FinnSentiment-1.1.tsv",
+        "../data/finsen-v1-1-src/FinnSentiment-1.1.tsv",
         sep="\t",
         header=None,
         usecols=[*range(0, 5), *range(15, 20)],

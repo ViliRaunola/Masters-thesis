@@ -7,10 +7,9 @@ import dotenv
 import pandas as pd
 import praw
 import tabulate
+import utility.text_processing as text_processing
 from praw import exceptions as praw_exceptions
-
-import text_processing
-from common import CLASSIFIER_LABELS, NlpTools, colors
+from utility.common import CLASSIFIER_LABELS, NlpTools, colors
 
 
 def create_praw_instance():
@@ -515,5 +514,3 @@ def start_reddit_analyzer_full(nlp_tools: Type[NlpTools], reddit: Type[praw.Redd
     _title_analysis(nlp_tools=nlp_tools, post=post)
     _post_analysis(nlp_tools=nlp_tools, post=post)
     _all_comments_analysis(nlp_tools=nlp_tools, post=post)
-
-    #!TODO Add the ner tagging, combine the results somehow... maybe use the text highlight

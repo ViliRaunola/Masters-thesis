@@ -6,13 +6,12 @@ import numpy as np
 import pandas as pd
 import torch
 import transformers
-
-import common
-
-_REPO_NAME = "./model_ner"
-_MODEL_FOLDER = "model_ner"
+import utility.common as common
 
 # Private globals
+_REPO_NAME = "./models/model_ner"
+_MODEL_FOLDER = "/models/model_ner"
+
 _LABEL_LIST = [
     "O",
     "B-PERSON",
@@ -40,7 +39,6 @@ def create_ner_finbert():
     """
     Return 1 for failed attempt, 0 for success
     """
-
     try:
         if len(os.listdir(_MODEL_FOLDER)) != 0:
             print(
@@ -108,7 +106,7 @@ def _load_model():
     ids_to_labels = _create_label_mapping_dics()[1]
 
     ner_model = transformers.AutoModelForTokenClassification.from_pretrained(
-        "./model_ner", id2label=ids_to_labels
+        _REPO_NAME, id2label=ids_to_labels
     )
 
     return ner_model
@@ -138,9 +136,9 @@ def _tokenize_data(train_dataset, dev_dataset, test_dataset, tokenizer):
 
 def _prepare_data():
     # Load data from files
-    turku_one_data_train = _read_coll_file("./data_ner/data/conll/train.tsv")
-    turku_one_data_dev = _read_coll_file("./data_ner/data/conll/dev.tsv")
-    turku_one_data_test = _read_coll_file("./data_ner/data/conll/test.tsv")
+    turku_one_data_train = _read_coll_file("../data_ner/data/conll/train.tsv")
+    turku_one_data_dev = _read_coll_file("../data_ner/data/conll/dev.tsv")
+    turku_one_data_test = _read_coll_file("../data_ner/data/conll/test.tsv")
 
     lables_to_ids = _create_label_mapping_dics()[0]
 

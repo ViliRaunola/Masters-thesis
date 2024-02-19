@@ -1,6 +1,6 @@
 import unittest
 
-import text_processing
+import utility.text_processing as text_processing
 
 
 class TestTestProcessing(unittest.TestCase):
