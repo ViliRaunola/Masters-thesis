@@ -97,13 +97,18 @@ def _root_comment_analysis(
             print("using the version for longer inputs")
             comment_sentiment = nlp_tools.sentiment_pipeline_long(post)
 
-        temp = _text_ner_analysis(nlp_tools=nlp_tools, text=comment_text)
-        ner_saved.append(temp)
-
         # Save results
         tags_list.append(
             {"label": comment_sentiment["label"], "score": comment_sentiment["score"]}
         )
+
+        temp = _text_ner_analysis(
+            nlp_tools=nlp_tools,
+            text=comment_text,
+            context_score=tags_list[-1],
+        )
+        ner_saved.append(temp)
+
         rows.append(
             [comment_sentiment["label"], comment_sentiment["score"], comment_text]
         )
@@ -137,7 +142,16 @@ def _combine_ner_results(ner_saved: list):
 
     for comment_ner_results in ner_saved:
         for tag in comment_ner_results:
-            temp[tag].extend(comment_ner_results[tag])
+            if tag in temp:
+                for result in comment_ner_results[tag]:
+                    result["context_label"] = comment_ner_results["context_label"]
+                    result["context_score"] = comment_ner_results["context_score"]
+                    result["context_text"] = comment_ner_results["context_text"]
+
+    for comment_ner_results in ner_saved:
+        for tag in comment_ner_results:
+            if tag in temp:
+                temp[tag].extend(comment_ner_results[tag])
 
     return temp
 
@@ -165,12 +179,16 @@ def _recursion_on_comments(
             print("using the version for longer inputs")
             comment_sentiment = nlp_tools.sentiment_pipeline_long(comment_text)
 
-        unpacked_results = _text_ner_analysis(nlp_tools=nlp_tools, text=comment_text)
-        ner_results_all.append(unpacked_results)
-
         result_list.append(
             {"label": comment_sentiment["label"], "score": comment_sentiment["score"]}
         )
+
+        unpacked_results = _text_ner_analysis(
+            nlp_tools=nlp_tools,
+            text=comment_text,
+            context_score=result_list[-1],
+        )
+        ner_results_all.append(unpacked_results)
 
     if hasattr(comment, "replies"):
         for reply in comment.replies:
@@ -208,13 +226,17 @@ def _analyse_root_and_replies(
             print("using the version for longer inputs")
             comment_sentiment = nlp_tools.sentiment_pipeline_long(comment_text)[0]
 
-        unpacked_results = _text_ner_analysis(nlp_tools=nlp_tools, text=comment_text)
-        ner_results_all.append(unpacked_results)
-
         # Save result of root comment analysis
         root_comment_tags_list.append(
             {"label": comment_sentiment["label"], "score": comment_sentiment["score"]}
         )
+
+        unpacked_results = _text_ner_analysis(
+            nlp_tools=nlp_tools,
+            text=comment_text,
+            context_score=root_comment_tags_list[-1],
+        )
+        ner_results_all.append(unpacked_results)
 
         # Adding new list for each root comment
         root_comment_children_sentiments.append([])
@@ -381,11 +403,42 @@ def _unpack_ner_results(results: list):
 
 
 def _print_ner_results(results: dict, save_to_file: bool = False):
-    header = ["Label", "Score", "Word"]
+    header = [
+        "Label",
+        "Score",
+        "Word",
+        "Context label",
+        "Context score",
+        "Context text after preprocessing",
+    ]
     rows = []
     for tag in results:
         for list_values in results[tag]:
-            rows.append([tag, list_values["score"], list_values["word"]])
+
+            if (
+                (list_values.get("context_score") is not None)
+                or (list_values.get("context_label") is not None)
+                or (list_values.get("context_text") is not None)
+            ):
+                rows.append(
+                    [
+                        tag,
+                        list_values["score"],
+                        list_values["word"],
+                        list_values["context_label"],
+                        list_values["context_score"],
+                        list_values["context_text"],
+                    ]
+                )
+            else:
+                rows.append(
+                    [
+                        tag,
+                        list_values["score"],
+                        list_values["word"],
+                    ]
+                )
+
     if not save_to_file:
         print(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
         return
@@ -425,9 +478,18 @@ def _most_common_ner_tags_in_results(results: dict):
         print(top_ten)
 
 
-def _text_ner_analysis(nlp_tools: Type[NlpTools], text: str):
+def _text_ner_analysis(
+    nlp_tools: Type[NlpTools],
+    text: str,
+    context_score: dict = None,
+):
     results = nlp_tools.ner_pipeline(text)
     unpacked_results = _unpack_ner_results(results)
+
+    if context_score is not None:
+        unpacked_results["context_label"] = context_score["label"]
+        unpacked_results["context_score"] = context_score["score"]
+        unpacked_results["context_text"] = text
 
     return unpacked_results
 

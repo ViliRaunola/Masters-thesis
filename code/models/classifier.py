@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from typing import Type
 
@@ -13,6 +14,13 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 # Private globals
 _REPO_NAME = "./models/model"
 _MODEL_FOLDER = "/models/model"
+
+gettrace = getattr(sys, "gettrace", None)
+if gettrace is None:
+    print("No sys.gettrace")
+elif gettrace():
+    _REPO_NAME = "./code/models/model"
+    _MODEL_FOLDER = "/code/models/model"
 
 
 ################# Public Functions #################

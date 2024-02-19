@@ -8,6 +8,13 @@ from transformers import Pipeline
 
 _REPO_NAME_CLASS = "./models/model"
 _REPO_NAME_NER = "./models/model_ner"
+gettrace = getattr(sys, "gettrace", None)
+if gettrace is None:
+    print("No sys.gettrace")
+elif gettrace():
+    _REPO_NAME_CLASS = "./code/models/model"
+    _REPO_NAME_NER = "./code/models/model_ner"
+
 
 CLASSIFIER_LABELS = ["neg", "neut", "pos"]
 
@@ -133,7 +140,8 @@ def check_folder_ner():
     """
     True, if folder exist and has data --> model most likely trained
     """
-    print(os.path.isdir(_REPO_NAME_NER))
+    print(os.path.abspath("."))
+
     if not os.path.isdir(_REPO_NAME_NER):
         return False
     if not os.listdir(_REPO_NAME_NER):

@@ -1,5 +1,6 @@
 import itertools
 import os
+import sys
 
 import datasets
 import numpy as np
@@ -11,6 +12,14 @@ import utility.common as common
 # Private globals
 _REPO_NAME = "./models/model_ner"
 _MODEL_FOLDER = "/models/model_ner"
+
+gettrace = getattr(sys, "gettrace", None)
+if gettrace is None:
+    print("No sys.gettrace")
+elif gettrace():
+    _REPO_NAME = "./code/models/model_ner"
+    _MODEL_FOLDER = "/code/models/model_ner"
+
 
 _LABEL_LIST = [
     "O",
