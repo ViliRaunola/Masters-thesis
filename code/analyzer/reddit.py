@@ -1,5 +1,4 @@
 import os
-import re
 from collections import Counter
 from typing import Type
 
@@ -7,9 +6,11 @@ import dotenv
 import pandas as pd
 import praw
 import tabulate
+import utility.globals as globals
 import utility.text_processing as text_processing
 from praw import exceptions as praw_exceptions
-from utility.common import CLASSIFIER_LABELS, NlpTools, colors
+from utility import common
+from utility.common import NlpTools, colors
 
 
 def create_praw_instance():
@@ -72,7 +73,7 @@ def _count_sent_label_occurances(tags_list: list):
     counter = Counter()
     for dictionary in tags_list:
         for value in dictionary.values():
-            if value in CLASSIFIER_LABELS:
+            if value in globals.CLASSIFIER_LABELS:
                 counter[value] += 1
     return counter
 
@@ -116,6 +117,7 @@ def _root_comment_analysis(
     # Individual results
     header = ["Label", "Score", "Comment after preprocessing"]
     file_name = "table_root_comments_sentiment.txt"
+    file_name = common.create_unique_file_name(file_name)
     with open(file_name, "w", encoding="utf-8") as f:
         f.write(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
     print(
@@ -331,6 +333,7 @@ def _print_root_comment_results(
         )
 
     file_name = "table_comments_sentiment.txt"
+    file_name = common.create_unique_file_name(file_name)
     print(
         f"\nPost's root comment and root comment's replies are saved to file: {colors.CBLUE}{file_name}{colors.CEND}"
     )
@@ -385,6 +388,7 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
     for result in all_comments_sentiment_results:
         rows.append([result["label"], result["score"], result["text"]])
     file_name = "table_all_comments_sentiment.txt"
+    file_name = common.create_unique_file_name(file_name)
     with open(file_name, "w", encoding="utf-8") as f:
         f.write(
             tabulate.tabulate(
@@ -495,6 +499,7 @@ def _print_ner_results(results: dict, save_to_file: bool = False):
         return
 
     file_name = "table_ner_tags_comments.txt"
+    file_name = common.create_unique_file_name(file_name)
     print(f"\nSaved NER results to file: {colors.CBLUE}{file_name}{colors.CEND}\n")
     with open(file_name, "w", encoding="utf-8") as f:
         f.write(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
@@ -583,6 +588,7 @@ def _write_ner_tag_with_sentiment_score_to_file(
     rows = []
 
     file_name = "ner_context.txt"
+    file_name = common.create_unique_file_name(file_name)
 
     with open(file_name, "w", encoding="utf-8") as f:
         f.write("")

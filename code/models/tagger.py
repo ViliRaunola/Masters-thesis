@@ -8,39 +8,7 @@ import pandas as pd
 import torch
 import transformers
 import utility.common as common
-
-# Private globals
-_REPO_NAME = "./models/model_ner"
-_MODEL_FOLDER = "/models/model_ner"
-
-gettrace = getattr(sys, "gettrace", None)
-if gettrace is None:
-    print("No sys.gettrace")
-elif gettrace():
-    _REPO_NAME = "./code/models/model_ner"
-    _MODEL_FOLDER = "/code/models/model_ner"
-
-
-_LABEL_LIST = [
-    "O",
-    "B-PERSON",
-    "I-PERSON",
-    "B-LOC",
-    "I-LOC",
-    "B-ORG",
-    "I-ORG",
-    "B-PRODUCT",
-    "I-PRODUCT",
-    "B-EVENT",
-    "I-EVENT",
-    "B-DATE",
-    "I-DATE",
-    "B-GPE",
-    "I-GPE",
-]
-
-# Selecting the metric to use
-METRIC = datasets.load_metric("seqeval", trust_remote_code=True)
+import utility.globals as globals
 
 
 ################# Public Functions #################
@@ -49,9 +17,9 @@ def create_ner_finbert():
     Return 1 for failed attempt, 0 for success
     """
     try:
-        if len(os.listdir(_MODEL_FOLDER)) != 0:
+        if len(os.listdir(globals.MODEL_FOLDER_NER)) != 0:
             print(
-                f"{common.colors.CYELLOW}The folder {_MODEL_FOLDER} is not empty. Please clear it before training the model{common.colors.CEND}"
+                f"{common.colors.CYELLOW}The folder {globals.MODEL_FOLDER_NER} is not empty. Please clear it before training the model{common.colors.CEND}"
             )
             return 1
     except FileNotFoundError:
@@ -77,20 +45,20 @@ def create_ner_finbert():
     )
 
     # Saving the model for later use
-    trainer.save_model("./model_ner")
+    trainer.save_model(globals.REPO_NAME_NER)
 
     _test_model(trainer, test_tokenized_datasets)
     print(
-        f"{common.colors.CGREEN}Creating the FinBERT model with turku-one data has been succesfull. The model has been saved to {_REPO_NAME}{common.colors.CEND}"
+        f"{common.colors.CGREEN}Creating the FinBERT model with turku-one data has been succesfull. The model has been saved to {globals.REPO_NAME_NER}{common.colors.CEND}"
     )
     return 0
 
 
 def get_ner_pipeline():
-    if os.path.isdir(_REPO_NAME):
-        if not os.listdir(_REPO_NAME):
+    if os.path.isdir(globals.REPO_NAME_NER):
+        if not os.listdir(globals.REPO_NAME_NER):
             print(
-                f"{common.colors.CYELLOW}The folder: {_REPO_NAME} is empty. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
+                f"{common.colors.CYELLOW}The folder: {globals.REPO_NAME_NER} is empty. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
             )
             return None
         else:
@@ -103,7 +71,7 @@ def get_ner_pipeline():
             return sentiment_pipeline
     else:
         print(
-            f"{common.colors.CYELLOW}The folder: {_REPO_NAME} doesn't exist. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
+            f"{common.colors.CYELLOW}The folder: {globals.REPO_NAME_NER} doesn't exist. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
         )
         return None
 
@@ -115,16 +83,16 @@ def _load_model():
     ids_to_labels = _create_label_mapping_dics()[1]
 
     ner_model = transformers.AutoModelForTokenClassification.from_pretrained(
-        _REPO_NAME, id2label=ids_to_labels
+        globals.REPO_NAME_NER, id2label=ids_to_labels
     )
 
     return ner_model
 
 
 def _create_folder_for_model():
-    print(f"Creating a new folder for the model: {_MODEL_FOLDER}")
+    print(f"Creating a new folder for the model: {globals.MODEL_FOLDER_NER}")
     current_directory = os.getcwd()
-    final_directory = os.path.join(current_directory, _MODEL_FOLDER)
+    final_directory = os.path.join(current_directory, globals.MODEL_FOLDER_NER)
     if not os.path.exists(final_directory):
         os.makedirs(final_directory)
 
@@ -174,15 +142,17 @@ def _test_model(trainer, test_tokenized_datasets):
 
     # Remove ignored index (special tokens)
     true_predictions = [
-        [_LABEL_LIST[p] for (p, l) in zip(prediction, label) if l != -100]
+        [globals.LABEL_LIST[p] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)
     ]
     true_labels = [
-        [_LABEL_LIST[l] for (p, l) in zip(prediction, label) if l != -100]
+        [globals.LABEL_LIST[l] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)
     ]
 
-    results = METRIC.compute(predictions=true_predictions, references=true_labels)
+    results = globals.METRIC.compute(
+        predictions=true_predictions, references=true_labels
+    )
     print(results)
 
 
@@ -200,7 +170,7 @@ def _train_model(
     weight_decay = 0.01
 
     args = transformers.TrainingArguments(
-        output_dir=_REPO_NAME,
+        output_dir=globals.REPO_NAME_NER,
         evaluation_strategy="epoch",
         save_strategy="epoch",
         logging_strategy="epoch",
@@ -239,15 +209,17 @@ def _compute_metrics(p):
     predictions = np.argmax(predictions, axis=2)
     # Remove ignored index (special tokens)
     true_predictions = [
-        [_LABEL_LIST[p] for (p, l) in zip(prediction, label) if l != -100]
+        [globals.LABEL_LIST[p] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)
     ]
     true_labels = [
-        [_LABEL_LIST[l] for (p, l) in zip(prediction, label) if l != -100]
+        [globals.LABEL_LIST[l] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)
     ]
 
-    results = METRIC.compute(predictions=true_predictions, references=true_labels)
+    results = globals.METRIC.compute(
+        predictions=true_predictions, references=true_labels
+    )
     return {
         "precision": results["overall_precision"],
         "recall": results["overall_recall"],
@@ -258,7 +230,7 @@ def _compute_metrics(p):
 
 def _load_fin_bert():
     model = transformers.AutoModelForTokenClassification.from_pretrained(
-        "TurkuNLP/bert-base-finnish-cased-v1", num_labels=len(_LABEL_LIST)
+        "TurkuNLP/bert-base-finnish-cased-v1", num_labels=len(globals.LABEL_LIST)
     )
     if torch.cuda.is_available():
         print("Cuda is available, using it for the model.")
@@ -310,11 +282,11 @@ def _create_label_mapping_dics():
     lables_to_ids = {}
     ids_to_labels = {}
 
-    for index, label in enumerate(_LABEL_LIST):
+    for index, label in enumerate(globals.LABEL_LIST):
         temp = {label: index}
         lables_to_ids.update(temp)
 
-    for index, label in enumerate(_LABEL_LIST):
+    for index, label in enumerate(globals.LABEL_LIST):
         temp = {index: label}
         ids_to_labels.update(temp)
 

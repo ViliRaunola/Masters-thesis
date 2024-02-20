@@ -1,26 +1,13 @@
 import os
-import sys
-from pathlib import Path
 from typing import Type
 
 import datasets
-import numpy as np
 import pandas as pd
 import torch
 import transformers
 import utility.common as common
+import utility.globals as globals
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-
-# Private globals
-_REPO_NAME = "./models/model"
-_MODEL_FOLDER = "/models/model"
-
-gettrace = getattr(sys, "gettrace", None)
-if gettrace is None:
-    print("No sys.gettrace")
-elif gettrace():
-    _REPO_NAME = "./code/models/model"
-    _MODEL_FOLDER = "/code/models/model"
 
 
 ################# Public Functions #################
@@ -30,9 +17,9 @@ def create_finbert():
     """
 
     try:
-        if len(os.listdir(_MODEL_FOLDER)) != 0:
+        if len(os.listdir(globals.MODEL_FOLDER_CLASS)) != 0:
             print(
-                f"{common.colors.CYELLOW} The folder {_MODEL_FOLDER} is not empty. Please clear it before training the model {common.colors.CEND}"
+                f"{common.colors.CYELLOW} The folder {globals.MODEL_FOLDER_CLASS} is not empty. Please clear it before training the model {common.colors.CEND}"
             )
             return 1
     except FileNotFoundError:
@@ -42,15 +29,6 @@ def create_finbert():
     dataset_fin_sentiment = _prepare_fin_sentiment()
     data_sets_splits = _split_dataset(dataset_fin_sentiment)
 
-    #!TODO needed?
-    # np.unique(data_sets_splits["train"]["label"])
-    # print(np.unique(data_sets_splits["train"]["label"]))
-
-    #!TODO can be removed, jsut for checking how the data looks
-    for i in range(10):
-        print("text:", data_sets_splits["train"]["text"][i])
-        print("label:", data_sets_splits["train"]["label"][i])
-
     tokenized_dataset = _tokenize_dataset(data_sets_splits, tokenizer)
 
     data_collator = transformers.DataCollatorWithPadding(tokenizer=tokenizer)
@@ -59,22 +37,22 @@ def create_finbert():
         tokenized_dataset=tokenized_dataset,
         tokenizer=tokenizer,
         data_collator=data_collator,
-        repo_name=_REPO_NAME,
+        repo_name=globals.REPO_NAME_CLASS,
     )
-    trainer.save_model(_REPO_NAME)
+    trainer.save_model(globals.REPO_NAME_CLASS)
 
     _test_trained_model(trainer, tokenized_dataset)
     print(
-        f"{common.colors.CGREEN}Creating the FinBERT model with FinSentiment data has been succesfull. The model has been saved to {_REPO_NAME}{common.colors.CEND}"
+        f"{common.colors.CGREEN}Creating the FinBERT model with FinSentiment data has been succesfull. The model has been saved to {globals.REPO_NAME_CLASS}{common.colors.CEND}"
     )
     return 0
 
 
 def get_sentiment_pipeline():
-    if os.path.isdir(_REPO_NAME):
-        if not os.listdir(_REPO_NAME):
+    if os.path.isdir(globals.REPO_NAME_CLASS):
+        if not os.listdir(globals.REPO_NAME_CLASS):
             print(
-                f"{common.colors.CYELLOW}The folder: {_REPO_NAME} is empty. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
+                f"{common.colors.CYELLOW}The folder: {globals.REPO_NAME_CLASS} is empty. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
             )
             return None
         else:
@@ -87,7 +65,7 @@ def get_sentiment_pipeline():
             return sentiment_pipeline
     else:
         print(
-            f"{common.colors.CYELLOW}The folder: {_REPO_NAME} doesn't exist. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
+            f"{common.colors.CYELLOW}The folder: {globals.REPO_NAME_CLASS} doesn't exist. This suggests that the model has not been trained yet. Please tain it before accessing it.{common.colors.CEND}"
         )
         return None
 
@@ -292,9 +270,9 @@ def _test_trained_model(trainer, tokenized_dataset):
 
 
 def _create_folder_for_model():
-    print(f"Creating a new folder for the model: {_MODEL_FOLDER}")
+    print(f"Creating a new folder for the model: {globals.MODEL_FOLDER_CLASS}")
     current_directory = os.getcwd()
-    final_directory = os.path.join(current_directory, _MODEL_FOLDER)
+    final_directory = os.path.join(current_directory, globals.MODEL_FOLDER_CLASS)
     if not os.path.exists(final_directory):
         os.makedirs(final_directory)
 
@@ -318,7 +296,7 @@ def _compute_metrics(pred):
 def load_model():
     id2label = {0: "neg", 1: "neut", 2: "pos"}
     sentiment_model = transformers.AutoModelForSequenceClassification.from_pretrained(
-        _REPO_NAME, id2label=id2label
+        globals.REPO_NAME_CLASS, id2label=id2label
     )
     return sentiment_model
 
@@ -358,6 +336,7 @@ def _long_text_classifier(text: str):
     return {"label": f"{id2label[label_id]}", "score": mean.detach().numpy()[label_id]}
 
 
+# Source: https://www.youtube.com/watch?v=yDGo9z_RlnE
 def _split_tokens_into_chunks(input_id_chunks: list, mask_chunks: list, chunksize: int):
     #!The CLC is 102 and SEP is 103!!!
     for i in range(len(input_id_chunks)):

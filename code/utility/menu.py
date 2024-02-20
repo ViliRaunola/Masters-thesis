@@ -1,13 +1,11 @@
 from typing import Type
 
-from praw import Reddit
-
 import analyzer.reddit as reddit
 import models.classifier as classifier
 import models.tagger as tagger
+import utility.globals as globals
+from praw import Reddit
 from utility.common import NlpTools, colors, exit_program
-
-MENU_BORDER_SIZE = 40
 
 
 def start_menu():
@@ -20,12 +18,12 @@ def start_menu():
     """
 
     menu = f"""
-{"-" * MENU_BORDER_SIZE}
+{"-" * globals.MENU_BORDER_SIZE}
 | You need to have neural networks created on your machine before analyzing posts.
 | 0 - exit the program
 | 1 - train NER model
 | 2 - train classifier model
-{"-" * MENU_BORDER_SIZE}
+{"-" * globals.MENU_BORDER_SIZE}
     """
     print(menu)
 
@@ -43,13 +41,13 @@ def main_menu():
     """
 
     menu = f"""
-{"-" * MENU_BORDER_SIZE}
+{"-" * globals.MENU_BORDER_SIZE}
 | Please select the next operation:
 | 0) exit
 | 1) analyse reddit post
 | 2) analyse reddit post and root comments
 | 3) analyse reddit post, root comments and comment replies (full)
-{"-" * MENU_BORDER_SIZE}
+{"-" * globals.MENU_BORDER_SIZE}
         """
     print(menu)
 

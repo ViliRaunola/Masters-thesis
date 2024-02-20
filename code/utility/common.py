@@ -1,22 +1,12 @@
+import datetime
 import os
 import sys
 from typing import Type
 
 import models.classifier as classifier
 import models.tagger as tagger
+import utility.globals as globals
 from transformers import Pipeline
-
-_REPO_NAME_CLASS = "./models/model"
-_REPO_NAME_NER = "./models/model_ner"
-gettrace = getattr(sys, "gettrace", None)
-if gettrace is None:
-    print("No sys.gettrace")
-elif gettrace():
-    _REPO_NAME_CLASS = "./code/models/model"
-    _REPO_NAME_NER = "./code/models/model_ner"
-
-
-CLASSIFIER_LABELS = ["neg", "neut", "pos"]
 
 
 class NlpTools:
@@ -142,9 +132,9 @@ def check_folder_ner():
     """
     print(os.path.abspath("."))
 
-    if not os.path.isdir(_REPO_NAME_NER):
+    if not os.path.isdir(globals.REPO_NAME_NER):
         return False
-    if not os.listdir(_REPO_NAME_NER):
+    if not os.listdir(globals.REPO_NAME_NER):
         return False
     return True
 
@@ -153,9 +143,9 @@ def check_folder_class():
     """
     True, if folder exist and has data --> model most likely trained
     """
-    if not os.path.isdir(_REPO_NAME_CLASS):
+    if not os.path.isdir(globals.REPO_NAME_CLASS):
         return False
-    if not os.listdir(_REPO_NAME_CLASS):
+    if not os.listdir(globals.REPO_NAME_CLASS):
         return False
     return True
 
@@ -198,3 +188,18 @@ def exit_program(exit_message=None):
         sys.exit()
     else:
         sys.exit(exit_message)
+
+
+def create_unique_file_name(file_name: str):
+    split_string = file_name.split(".")
+    ct = datetime.datetime.now()
+    date_time = "%02d_%02d_%04d_%02d_%02d_%02d" % (
+        ct.day,
+        ct.month,
+        ct.year,
+        ct.hour,
+        ct.minute,
+        ct.second,
+    )
+    unique_file_name = f"{split_string[0]}_{date_time}.{split_string[1]}"
+    return unique_file_name
