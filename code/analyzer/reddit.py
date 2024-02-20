@@ -418,7 +418,6 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
     _most_common_ner_tags_in_results(combined_ner_results)
 
 
-#!TODO refactor to reduce complexity
 def _unpack_ner_results(results: list):
     parsed_results = {
         "PERSON": [],
@@ -519,7 +518,6 @@ def _create_data_frame_for_ner_sentiment_analysis(results: dict):
         "Context text after preprocessing",
     ]
     rows = []
-    #!TODO this has been done earlier, no need to compute again!
     for tag in results:
         for list_values in results[tag]:
             rows.append(

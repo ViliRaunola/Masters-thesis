@@ -238,7 +238,7 @@ def _train_fin_bert(repo_name, tokenized_dataset, tokenizer, data_collator):
         logging_dir="./logs",
     )
 
-    #!TODO selvitä lisää tästä
+    # Source https://huggingface.co/docs/transformers/main_classes/callback
     early_stopping = transformers.EarlyStoppingCallback(early_stopping_patience=2)
 
     trainer = transformers.Trainer(

@@ -132,7 +132,7 @@ def _prepare_data():
     return (train_dataset, dev_dataset, test_dataset)
 
 
-#!TODO source
+# source: https://github.com/huggingface/notebooks/blob/main/examples/token_classification.ipynb
 def _test_model(trainer, test_tokenized_datasets):
     predictions, labels, metrics = trainer.predict(test_tokenized_datasets)
 
@@ -185,7 +185,7 @@ def _train_model(
         logging_dir="./logs",
     )
 
-    #!TODO selvitä lisää tästä
+    # Source https://huggingface.co/docs/transformers/main_classes/callback
     early_stopping = transformers.EarlyStoppingCallback(early_stopping_patience=2)
 
     trainer = transformers.Trainer(
