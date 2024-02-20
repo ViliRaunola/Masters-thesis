@@ -201,5 +201,13 @@ def create_unique_file_name(file_name: str):
         ct.minute,
         ct.second,
     )
-    unique_file_name = f"{split_string[0]}_{date_time}.{split_string[1]}"
+    unique_file_name = (
+        f"{globals.RESULTS_FOLDER_NAME}/{split_string[0]}_{date_time}.{split_string[1]}"
+    )
     return unique_file_name
+
+
+def create_output_folder():
+    is_exist = os.path.exists(globals.RESULTS_FOLDER_NAME)
+    if not is_exist:
+        os.makedirs(globals.RESULTS_FOLDER_NAME)

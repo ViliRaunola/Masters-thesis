@@ -41,3 +41,6 @@ LABEL_LIST = [
 
 # Selecting the metric to use
 METRIC = datasets.load_metric("seqeval", trust_remote_code=True)
+
+
+RESULTS_FOLDER_NAME = "results"

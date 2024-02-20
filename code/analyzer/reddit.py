@@ -118,6 +118,7 @@ def _root_comment_analysis(
     header = ["Label", "Score", "Comment after preprocessing"]
     file_name = "table_root_comments_sentiment.txt"
     file_name = common.create_unique_file_name(file_name)
+    common.create_output_folder()
     with open(file_name, "w", encoding="utf-8") as f:
         f.write(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
     print(
@@ -334,6 +335,7 @@ def _print_root_comment_results(
 
     file_name = "table_comments_sentiment.txt"
     file_name = common.create_unique_file_name(file_name)
+    common.create_output_folder()
     print(
         f"\nPost's root comment and root comment's replies are saved to file: {colors.CBLUE}{file_name}{colors.CEND}"
     )
@@ -389,6 +391,7 @@ def _sentiment_analysis_all_comments(post, nlp_tools: Type[NlpTools]):
         rows.append([result["label"], result["score"], result["text"]])
     file_name = "table_all_comments_sentiment.txt"
     file_name = common.create_unique_file_name(file_name)
+    common.create_output_folder()
     with open(file_name, "w", encoding="utf-8") as f:
         f.write(
             tabulate.tabulate(
@@ -500,6 +503,7 @@ def _print_ner_results(results: dict, save_to_file: bool = False):
 
     file_name = "table_ner_tags_comments.txt"
     file_name = common.create_unique_file_name(file_name)
+    common.create_output_folder()
     print(f"\nSaved NER results to file: {colors.CBLUE}{file_name}{colors.CEND}\n")
     with open(file_name, "w", encoding="utf-8") as f:
         f.write(tabulate.tabulate(tabular_data=rows, headers=header, tablefmt="grid"))
@@ -589,6 +593,7 @@ def _write_ner_tag_with_sentiment_score_to_file(
 
     file_name = "ner_context.txt"
     file_name = common.create_unique_file_name(file_name)
+    common.create_output_folder()
 
     with open(file_name, "w", encoding="utf-8") as f:
         f.write("")
