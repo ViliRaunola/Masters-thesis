@@ -1,3 +1,5 @@
+import pprint
+
 import datasets
 import evaluate
 import models.tagger as tagger
@@ -6,9 +8,13 @@ from transformers import TrainingArguments
 
 metric = evaluate.load("seqeval")
 
-my_data_val = tagger._read_coll_file("../own_data/results.tsv")
+my_data_val = tagger._read_coll_file("../own_data/results_annotated_from_testers.tsv")
 lables_to_ids = tagger._create_label_mapping_dics()[0]
 my_dataset = datasets.Dataset.from_pandas(my_data_val)
+
+print(my_dataset)
+
+pprint.pprint(my_dataset["labels"])
 
 pipeline = tagger.get_ner_pipeline()
 training_args = TrainingArguments("test_trainer")
