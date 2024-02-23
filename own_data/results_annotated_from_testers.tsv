@@ -1,19 +1,21 @@
 Suomalaisen	O
 suklaan	O
 valikoima	O
-Manilan	O
-IKEAssa	O
+Manilan	B-GPE
+IKEAssa	B-ORG
+
 Suomalaista	O
 suklaata	O
 ruotsalaisessa	O
 kaupassa	O
-Filippiineillä.	O
+Filippiineillä.	B-GPE
 Torille.	O
 
 Mitä	O
 nää	O
 maksaa	O
 siellä?	O
+
 tossa	O
 kuvassahan	O
 näkyy	O
@@ -21,11 +23,11 @@ hintalaput.	O
 Esimerkiksi	O
 joulukalenteri	O
 650	O
-Filippiinien	O
+Filippiinien	B-GPE
 pesoa	O
 joka	O
 tekee	O
-forexin	O
+forexin	B-ORG
 mukaan	O
 12€	O
 
@@ -50,7 +52,7 @@ käännettynä	O
 Eikö	O
 tää	O
 oo	O
-Filippiineillä	O
+Filippiineillä	B-GPE
 joku	O
 kahden	O
 päivän	O
@@ -62,7 +64,7 @@ turistit	O
 ostaa	O
 näitä.	O
 
-Manilassa	O
+Manilassa	B-GPE
 keskimääräinen	O
 palkka	O
 on	O
@@ -87,9 +89,9 @@ kun	O
 jonkun	O
 työttömän	O
 käynti	O
-mäkkärissä	O
+mäkkärissä	B-ORG
 hampurilaisaterialla	O
-Suomessa	O
+Suomessa	B-GPE
 tjsp.	O
 Maaseutu	O
 sitten	O
@@ -114,7 +116,7 @@ miksi	O
 ei	O
 ihan	O
 perus	O
-sinistä	O
+sinistä	B-PRODUCT
 :*)	O
 
 sille	O
@@ -129,15 +131,15 @@ se	O
 johtuu	O
 siitä	O
 että	O
-Mondelez	O
+Mondelez	B-ORG
 jatkaa	O
 toimintaansa	O
-Venäjällä.	O
+Venäjällä.	B-GPE
 
 Ai	O
 näinkö?	O
 
-Manilassa	O
+Manilassa	B-GPE
 voi	O
 maniassa	O
 saada	O
@@ -156,7 +158,7 @@ kaveri	O
 /	O
 serkku	O
 on	O
-Ikean	O
+Ikean	B-ORG
 sisäänostaja.	O
 Eniveis	O
 hyvin	O
@@ -180,9 +182,9 @@ Mitä?	O
 Ei	O
 turistit	O
 juuri	O
-IKEAssa	O
+IKEAssa	B-ORG
 käy	O
-Manilassa.	O
+Manilassa.	B-GPE
 
 On	O
 semmosia	O
@@ -197,7 +199,7 @@ turvallista.	O
 Sitä	O
 varten	O
 ne	O
-mäkkäritkin	O
+mäkkäritkin	B-ORG
 turistikohteissa	O
 on	O
 vaikka	O
@@ -211,7 +213,7 @@ ihme	O
 ajaisi	O
 turistin	O
 huonekalukauppaan?	O
-mäkkärit	O
+mäkkärit	B-ORG
 nyt	O
 ymmärrän	O
 kun	O
@@ -229,7 +231,7 @@ haluaa	O
 jotain	O
 helposti	O
 
-Ikeahan	O
+Ikeahan	B-ORG
 on	O
 myös	O
 ravintola	O
@@ -250,7 +252,7 @@ useampi	O
 kaveri	O
 jotka	O
 käy	O
-Ikeassa	O
+Ikeassa	B-ORG
 pelkästään	O
 syömässä	O
 
@@ -272,11 +274,11 @@ eivät	O
 ole	O
 asiakasryhmä	O
 jota	O
-ikea	O
+ikea	B-ORG
 haluaa	O
 erikseen	O
 houkutella.	O
-Ikea	O
+Ikea	B-ORG
 on	O
 ensisijaisesti	O
 huonekalumyymälä	O
@@ -311,9 +313,9 @@ jossa	O
 on	O
 maailman	O
 suurin	O
-IKEA	O
+IKEA	B-ORG
 ostetaan	O
-Fazeria	O
+Fazeria	B-PRODUCT
 ihan	O
 vaan	O
 niille	O
@@ -325,21 +327,21 @@ eksyy.	O
 Löytyy	O
 myös	O
 nykyään	O
-Etelä-Koreasta.	O
+Etelä-Koreasta.	B-GPE
 Kummasti	O
 kyllä	O
 meikkikaupan	O
 hyllyiltä.	O
 Ja	O
 sit	O
-Geishaa	O
+Geishaa	B-PRODUCT
 ja	O
 tummaa	O
 suklaata	O
 oli	O
 mut	O
 tavallinen	O
-sininen	O
+sininen	B-PRODUCT
 uupui	O
 joka	O
 kans	O
@@ -350,8 +352,8 @@ en	O
 tiiä	O
 mut	O
 tavallinen	O
-fazerin	O
-sininen	O
+fazerin	B-PRODUCT
+sininen	I-PRODUCT
 ei	O
 oo	O
 maailman	O
@@ -360,12 +362,12 @@ kovin	O
 kummoista	O
 suklaata	O
 
-Ylellä	O
+Ylellä	B-ORG
 haastateltiin	O
-Ville	O
-Vedenpäätä	O
-(YLE)	O
-Euroviisuista 	O
+Ville	B-PERSON
+Vedenpäätä	I-PERSON
+(YLE)	B-ORG
+Euroviisuista 	B-EVENT
 
 Hän	O
 ja	O
@@ -374,24 +376,24 @@ haastateltu	O
 molemmat	O
 sanoivat	O
 että	O
-Israelin	O
+Israelin	B-GPE
 pitäisi	O
 jättäytyä	O
 pois	O
-Euroviisuista	O
-Israelin	O
-sodan	O
+Euroviisuista	B-EVENT
+Israelin	B-EVENT
+sodan	I-EVENT
 takia.	O
-Ville	O
+Ville	B-PERSON
 sanoi	O
 myös	O
 että	O
-Malmössä	O
+Malmössä	B-GPE
 on	O
 suuri	O
 muslimiväestö	O
 ja	O
-Euroviisujen	O
+Euroviisujen	B-EVENT
 järjestäminen	O
 tässä	O
 tilanteessa	O
@@ -412,7 +414,7 @@ vähän	O
 peiliin	O
 katsottavaa	O
 jos	O
-Malmön	O
+Malmön	B-GPE
 muslimit	O
 on	O
 ongelma	O
@@ -422,13 +424,13 @@ olenkin	O
 sitä	O
 mieltä	O
 että	O
-Israelin	O
+Israelin	B-GPE
 pitäisi	O
 jättäytyä	O
 pois,	O
 niin	O
 ei	O
-Malmön	O
+Malmön	B-GPE
 muslimeilla	O
 pitäisi	O
 olla	O
@@ -438,7 +440,7 @@ varsinkaan	O
 väkivalla	O
 uhalla.	O
 
-Malmön	O
+Malmön	B-GPE
 muslimeita	O
 pitäisi	O
 asiassa	O
@@ -446,8 +448,8 @@ kuulla	O
 yhtä	O
 paljon	O
 kuin	O
-Port	O
-Royalen	O
+Port	B-PRODUCT
+Royalen	I-PRODUCT
 rastafareja	O
 
 Muslimihyökkäykset,	O
@@ -461,7 +463,7 @@ mahdollisuuksia.	O
 Mutta	O
 väliäkö	O
 tuolla	O
-Israelille,	O
+Israelille,	B-GPE
 kun	O
 on	O
 vain	O
@@ -472,7 +474,7 @@ laulaja	O
 kohteena.	O
 
 random laulaja	O
-Israel's	O
+Israel's	B-GPE
 biggest	O
 talent	O
 show	O
@@ -483,29 +485,29 @@ produced	O
 a	O
 new	O
 champion!	O
-Eden	O
-Golan	O
+Eden	B-PERSON
+Golan	I-PERSON
 has	O
 won	O
 the	O
 chance	O
 to	O
 represent	O
-Israel	O
+Israel	B-GPE
 at	O
 the	O
-Eurovision	O
-Song	O
-Contest	O
+Eurovision	B-EVENT
+Song	I-EVENT
+Contest	I-EVENT
 in	O
-Malmö	O
+Malmö	B-GPE
 this	O
-May.	O
+May.	B-DATE
 
 Montako	O
-Voice	O
-of	O
-Finland	O
+Voice	B-EVENT
+of	I-EVENT
+Finland	B-EVENT
 -voittajaa	O
 osaat	O
 nimetä?	O
@@ -523,7 +525,7 @@ todistaa.	O
 
 Mä	O
 ottaisin	O
-Edenin	O
+Edenin	B-PERSON
 sanan	O
 jokaisessa	O
 merkityksessä	O
@@ -531,9 +533,9 @@ miljoona	O
 kertaa	O
 ennemmin	O
 kuin	O
-Suomen	O
+Suomen	B-GPE
 PASKAN	O
-Windows95manin	O
+Windows95manin	B-PERSON
 :D	O
 
 Jaa	O
@@ -557,7 +559,7 @@ Ne	O
 jossain	O
 muualla	O
 
-Suomi	O
+Suomi	B-GPE
 voisi	O
 tarjota	O
 varusmiehiä	O
@@ -576,13 +578,13 @@ kanelipullaa	O
 aidossa	O
 ympäristössä.	O
 
-Suomen	O
-poliisi	O
+Suomen	B-ORG
+poliisi	I-ORG
 on	O
 jo	O
 käynyt	O
 haistelemassa	O
-Ruotsin	O
+Ruotsin	B-GPE
 tunnelmaa	O
 jalkapallo-ottelussa:	O
 Ruotsalaiskannattajien	O
@@ -597,7 +599,7 @@ olivat	O
 kotimaassa	O
 tottuneet.	O
 Sen	O
-Sinivuori	O
+Sinivuori	B-PERSON
 mainitsee	O
 ainoana	O
 yllätyksenä.	O
@@ -613,15 +615,15 @@ kiinni,	O
 jos	O
 on	O
 asiaa.	O
-Suomessa	O
+Suomessa	B-GPE
 pysytään	O
 muutaman	O
 metrin	O
 päässä.	O
 
-Ruotsi	O
+Ruotsi	B-GPE
 nopeasti	O
-natoon	O
+natoon	B-ORG
 jotta	O
 voi	O
 aktivoida	O
@@ -630,7 +632,7 @@ vitosen	O
 niin	O
 saadaan	O
 pidettyä	O
-euroviisut	O
+euroviisut	B-EVENT
 rauhassa. 	O
 
 Mietin,	O
@@ -1471,5 +1473,129 @@ kerta	O
 kun	O
 näin	O
 teen.	O
+
+Hieno!	O
+Ja	O
+varmaan	O
+musiikki	O
+soi.	O
+
+Tämä	O
+tunnari:	O
+
+Raktotorinko	O
+se	O
+vaatii?	O
+On	O
+jo	O
+kortti	O
+taskussa	O
+niin	O
+ei	O
+kuin	O
+vaan	O
+raktorimarkkinoille	O
+niin	O
+rakkauskin	O
+löytyy.	O
+
+:3	O
+
+Tääon	O
+sitä	O
+jotain	O
+
+Haapavesi	O
+vibe	O
+
+Hyvää	O
+kesälomaa	O
+etenkin	O
+pöndelegendoille	O
+jotka	O
+ajeli	O
+vastaan	O
+puku	O
+päällä	O
+Valmetin	O
+ratissa	O
+
+Minä	O
+ja	O
+kuka?	O
+
+Tällainen	O
+elämä	O
+olis	O
+niin	O
+mun	O
+unelmaa.	O
+Koko	O
+lapsuus	O
+meni	O
+traktorin	O
+kyydissä	O
+ja	O
+ikävöin	O
+sitä	O
+aikaa	O
+vieläkin.	O
+
+Romanttinen	O
+keli	O
+
+Vuoden	O
+luontokuva	O
+
+Kiitos!	O
+
+Niin	O
+monta	O
+iltaa	O
+on	O
+tullut	O
+istuttua	O
+traktorin	O
+ja	O
+puimurin	O
+kyydissä	O
+apukuskin	O
+paikalla,	O
+ai	O
+että	O
+
+Valehteleeko	O
+silmät	O
+vai	O
+onko	O
+Pohjanmaalla	O
+tultu	O
+nykyaikaan	O
+et	O
+naisetkin	O
+saa	O
+ajaa	O
+raktoria?	O
+
+En	O
+tajua.	O
+Kuvassa	O
+on	O
+traktori.	O
+Onko	O
+tää	O
+nyt	O
+se	O
+autismi?	O
+
+Kyllä	O
+sitä	O
+kuule	O
+kaikki	O
+meni	O
+70	O
+luvulla	O
+traktorilla	O
+tansseihin	O
 
 
