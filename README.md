@@ -12,7 +12,7 @@ Link to a demo video: ?
 
 ### Setup
 
-To use this program you need to set the training data to the correct folders. This is instructed in the [2. Training data](#2-training-data)
+To use this program you need to either train the models or download them from OneDrive. If training the models is done by yourself, the training data needs to be set to the correct folders. This is instructed in the [2. Training data](#2-training-data). Downloading the models are instructed in [4. Training/ Loading models](#4-training-loading-models)
 
 #### 1. Prerequisite
 
