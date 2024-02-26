@@ -40,6 +40,8 @@ The models are trained using [turku-one corpus](https://github.com/TurkuNLP/turk
 
 #### 3. Setting Python virtual environment
 
+The requirements for the virtual environment are in a file called ___
+
 #### 4. Training/ Loading models
 
 Link to OneDrive folder: ___________
