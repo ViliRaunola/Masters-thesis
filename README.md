@@ -40,7 +40,25 @@ The models are trained using [turku-one corpus](https://github.com/TurkuNLP/turk
 
 #### 3. Setting Python virtual environment
 
-The requirements for the virtual environment are in a file called ___
+The requirements for the virtual environment are in a file called './requirements.txt'. To create and install the requirements follow these steps:
+1. Open terminal and go to root of the project
+2. Install virtual environment by running
+   ```console
+   pip install virtualenv
+   ```
+3. Create the virtual environment by running
+    ```console
+   virtualenv venv
+   ```
+4. Activate and step into the virtual environment by running
+    ```console
+    .venv\Scripts\activate
+    ```
+5. Install the requirements in the virtual environment by running
+    ```console
+    pip install -r requirements.txt
+    ```
+
 
 #### 4. Training/ Loading models
 
