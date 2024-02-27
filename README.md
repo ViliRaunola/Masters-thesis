@@ -43,19 +43,23 @@ The models are trained using [turku-one corpus](https://github.com/TurkuNLP/turk
 
 The requirements for the virtual environment are in a file called './requirements.txt'. To create and install the requirements follow these steps:
 1. Open terminal and go to root of the project
-2. Install virtual environment by running
+2. Upgrade Pip & Install virtual environment by running
+   ```console
+   pip install --upgrade pip
+   ```
+
    ```console
    pip install virtualenv
    ```
-3. Create the virtual environment by running
+4. Create the virtual environment by running
     ```console
-   virtualenv venv
+   virtualenv .venv
    ```
-4. Activate and step into the virtual environment by running
+5. Activate and step into the virtual environment by running
     ```console
     .venv\Scripts\activate
     ```
-5. Install the requirements in the virtual environment by running
+6. Install the requirements in the virtual environment by running
     ```console
     pip install -r requirements.txt
     ```
@@ -69,7 +73,7 @@ If the models are not wanted to be trained they can be downloaded from OneDrive.
 1. Go to OneDrive and download the models [Link to OneDrive folder](https://lut-my.sharepoint.com/:f:/g/personal/vili_raunola_student_lut_fi/EmDKNLQmoStKrBRtCJ5sdvIBC1yVo4ii-F9MYuVDL6x8IQ?e=3lvHnf)
 2. Navigate to './code/models/' folder
 3. Copy the downloaded folders 'model' and 'ner_model' to this folder
-   i. In './code/models/' there should now be 'model/', 'ner_model/', 'classifier.py' and 'tagger.py'
+    1. In './code/models/' there should now be 'model/', 'ner_model/', 'classifier.py' and 'tagger.py'
 
 
 #### 5. Reddit API key
