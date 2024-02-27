@@ -42,24 +42,21 @@ The models are trained using [turku-one corpus](https://github.com/TurkuNLP/turk
 #### 3. Setting Python virtual environment
 
 The requirements for the virtual environment are in a file called './requirements.txt'. To create and install the requirements follow these steps:
-1. Open terminal and go to root of the project
-2. Upgrade Pip & Install virtual environment by running
-   ```console
-   pip install --upgrade pip
-   ```
+1. Open the terminal and go to the root of the project
+2. Install virtual Python environment by running
 
    ```console
-   pip install virtualenv
+   python -m venv .venv
    ```
-4. Create the virtual environment by running
-    ```console
-   virtualenv .venv
-   ```
-5. Activate and step into the virtual environment by running
+3. Activate and step into the virtual environment by running
     ```console
     .venv\Scripts\activate
     ```
-6. Install the requirements in the virtual environment by running
+4. Upgrade pip inside the virtual environment
+    ```console
+   pip install --upgrade pip
+   ```
+5. Install the requirements in the virtual environment by running. If this fails, the requirements need to be installed manually. Might fail if other than Python 3.8 is used!
     ```console
     pip install -r requirements.txt
     ```
@@ -87,10 +84,14 @@ If the models are not wanted to be trained they can be downloaded from OneDrive.
 
 Once the setup is done the program can be started.
 
-1. Go to './code/'
-2. Run the main file:
+1. Start the Python virtual environment if it is not running from the root of the project:
+   ```console
+    .venv\Scripts\activate
+    ```
+2. Go to './code/'
+3. Run the main file:
     ```console
     python main.py
     ```
-3. Follow the instructions given by the program
-4. Happy analyzing!
+4. Follow the instructions given by the program
+5. Happy analyzing!
