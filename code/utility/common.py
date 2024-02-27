@@ -130,7 +130,6 @@ def check_folder_ner():
     """
     True, if folder exist and has data --> model most likely trained
     """
-    print(os.path.abspath("."))
 
     if not os.path.isdir(globals.REPO_NAME_NER):
         return False

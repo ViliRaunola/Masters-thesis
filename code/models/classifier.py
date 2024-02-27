@@ -17,7 +17,7 @@ def create_finbert():
     """
 
     try:
-        if len(os.listdir(globals.MODEL_FOLDER_CLASS)) != 0:
+        if len(os.listdir(globals.REPO_NAME_CLASS)) != 0:
             print(
                 f"{common.colors.CYELLOW} The folder {globals.MODEL_FOLDER_CLASS} is not empty. Please clear it before training the model {common.colors.CEND}"
             )

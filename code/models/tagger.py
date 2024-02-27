@@ -17,7 +17,7 @@ def create_ner_finbert():
     Return 1 for failed attempt, 0 for success
     """
     try:
-        if len(os.listdir(globals.MODEL_FOLDER_NER)) != 0:
+        if len(os.listdir(globals.REPO_NAME_NER)) != 0:
             print(
                 f"{common.colors.CYELLOW}The folder {globals.MODEL_FOLDER_NER} is not empty. Please clear it before training the model{common.colors.CEND}"
             )
