@@ -1,7 +1,8 @@
 # Classifying Reddit posts using FinBert
 
+Link to publication: _____
 
-Link to published thesis: _____
+This program is an MVP to test out the possibilities of using ML in analyzing Finnish social media conversations. It can analyze any Reddit post which has a valid link. The output of the program is an analysis of the post's title, contents and comments. The sentiment and NER tags are identified. One of the output files includes the combination of these two that highlights the most frequent NER tags with the sentiment of the context from which the NER tag was found. Using this information one can get an overall idea of the conversation that happened in the post.
 
 ## Demo
 
@@ -12,7 +13,7 @@ Link to a demo video: ?
 
 ### Setup
 
-To use this program you need to either train the models or download them from OneDrive. If training the models is done by yourself, the training data needs to be set to the correct folders. This is instructed in the [2. Training data](#2-training-data). Downloading the models are instructed in [4. Training/ Loading models](#4-training-loading-models)
+To use this program you need to either train the models or download them from OneDrive. If training the models is done by yourself, the training data needs to be set to the correct folders. This is instructed in the [2. Training data](#2-training-data). If the models are not wanted to be trained yourself they can be downloaded. Downloading the models is instructed in [4. Training/ Loading models](#4-training-loading-models)
 
 #### 1. Prerequisite
 
@@ -62,6 +63,30 @@ The requirements for the virtual environment are in a file called './requirement
 
 #### 4. Training/ Loading models
 
-Link to OneDrive folder: ___________
+The program uses two trained neural networks to analyze the posts. These need to be either trained or downloaded before using the program. If the models are downloaded by the user, the training data needs to be downloaded to the correct folders first. This is shown in [2. Training data](#2-training-data). After the training data has been downloaded and the virtual environment is set, the program can be started. Go to section [Usage](#usage)
+
+If the models are not wanted to be trained they can be downloaded from OneDrive. Follow these instructions to start downloading the models:
+1. Go to OneDrive and download the models [Link to OneDrive folder](https://lut-my.sharepoint.com/:f:/g/personal/vili_raunola_student_lut_fi/EmDKNLQmoStKrBRtCJ5sdvIBC1yVo4ii-F9MYuVDL6x8IQ?e=3lvHnf)
+2. Navigate to './code/models/' folder
+3. Copy the downloaded folders 'model' and 'ner_model' to this folder
+   i. In './code/models/' there should now be 'model/', 'ner_model/', 'classifier.py' and 'tagger.py'
+
+
+#### 5. Reddit API key
+ To use this program a Reddit API key is needed to fetch the posts for analysis. To get yourself a Reddit API key follow the instructions here: https://www.jcchouinard.com/reddit-api/
+
+ Once you have obtained the API key, create a file called '.env' to the root of the project. An example of the contents is shown in './.envExample'-file. Paste your client_id, client_secret and user_agent to your '.env'-file.
+
+
 
 ### Usage
+
+Once the setup is done the program can be started.
+
+1. Go to './code/'
+2. Run the main file:
+    ```console
+    python main.py
+    ```
+3. Follow the instructions given by the program
+4. Happy analyzing!
