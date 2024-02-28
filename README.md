@@ -1,4 +1,4 @@
-# Classifying Reddit posts using FinBert
+# Analyzing Reddit posts using FinBert
 
 Link to publication: _____
 
