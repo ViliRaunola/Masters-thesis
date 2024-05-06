@@ -1,3 +1,4 @@
+import csv
 import os
 from typing import Type
 
@@ -97,13 +98,18 @@ def tokenize_long_text(text: str, tokenizer: Type[transformers.AutoTokenizer]):
 
 
 def _read_fin_sentiment():
-    fin_sentiment = pd.read_csv(
+    tfr = pd.read_csv(
         "../data/finsen-v1-1-src/FinnSentiment-1.1.tsv",
         sep="\t",
         header=None,
-        usecols=[*range(0, 5), *range(15, 20)],
+        usecols=[*range(0, 4), *range(19, 20)],
         index_col=False,
+        chunksize=1000,
+        encoding="utf8",
+        quoting=csv.QUOTE_NONE,
+        on_bad_lines="warn",
     )
+    fin_sentiment = pd.concat(tfr, ignore_index=True)
     return fin_sentiment
 
 
@@ -113,12 +119,12 @@ def _rename_fin_sentiment_columns(fin_sentiment):
         1: "B sentiment",
         2: "C sentiment",
         3: "majority value",
-        4: "derived values",
-        14: "pre-annotated sentiment smiley",
-        15: "pre-annotated sentiment product review",
-        16: "split #",
-        17: "batch #",
-        18: "index in original corpus",
+        # 4: "derived values",
+        # 14: "pre-annotated sentiment smiley",
+        # 15: "pre-annotated sentiment product review",
+        # 16: "split #",
+        # 17: "batch #",
+        # 18: "index in original corpus",
         19: "text",
     }
 
@@ -127,15 +133,20 @@ def _rename_fin_sentiment_columns(fin_sentiment):
 
 
 def _map_sentiment_values_to_fin_sentiment(fin_sentiment, class_names):
+    # mapping = {
+    #     1: class_names[0],
+    #     2: class_names[0],
+    #     3: class_names[1],
+    #     4: class_names[2],
+    #     5: class_names[2],
+    # }
     mapping = {
-        1: class_names[0],
-        2: class_names[0],
-        3: class_names[1],
-        4: class_names[2],
-        5: class_names[2],
+        -1: class_names[0],
+        0: class_names[1],
+        1: class_names[2],
     }
     # Adding a new column called 'sentiment'. Value based on the derived value.
-    fin_sentiment["label"] = fin_sentiment["derived values"].map(mapping)
+    fin_sentiment["label"] = fin_sentiment["majority value"].map(mapping)
     return fin_sentiment
 
 
@@ -159,8 +170,10 @@ def _prepare_fin_sentiment():
     print("Preparing the FinSentiment dataset...")
 
     fin_sentiment = _read_fin_sentiment()
+    print(fin_sentiment)
     fin_sentiment = _rename_fin_sentiment_columns(fin_sentiment)
     fin_sentiment = _map_sentiment_values_to_fin_sentiment(fin_sentiment, class_names)
+    print(fin_sentiment)
     dataset_fin_sentiment = _create_dataset_from_fin_sentiment(
         fin_sentiment, class_names
     )
@@ -175,25 +188,38 @@ def _split_dataset(dataset_fin_sentiment):
     print("Splitting the dataset...")
 
     # split the data, https://stackoverflow.com/questions/76001128/splitting-dataset-into-train-test-and-validation-using-huggingface-datasets-fun
-    train_dataset = dataset_fin_sentiment.train_test_split(
+    ds_train_devtest = dataset_fin_sentiment.train_test_split(
         test_size=first_split, seed=42, stratify_by_column="label"
     )
-    test_dataset = dataset_fin_sentiment.train_test_split(
+    ds_devtest = ds_train_devtest["test"].train_test_split(
         test_size=second_split, seed=42, stratify_by_column="label"
     )
 
     data_sets_splits = datasets.DatasetDict(
         {
-            "train": train_dataset["train"],
-            "valid": test_dataset["train"],
-            "test": test_dataset["test"],
+            "train": ds_train_devtest["train"],
+            "valid": ds_devtest["train"],
+            "test": ds_devtest["test"],
         }
     )
 
     print(
         f"The data has been split to training: {1-first_split}, validation: {first_split*second_split} and testing: {first_split*second_split}"
     )
+
     print(data_sets_splits)
+    # print(data_sets_splits["train"])
+    # print(data_sets_splits["valid"])
+    # print(data_sets_splits["test"])
+
+    # for i in range(0, 10):
+    #     print(data_sets_splits["train"][i])
+
+    # for i in range(0, 10):
+    #     print(data_sets_splits["valid"][i])
+
+    # for i in range(0, 10):
+    #     print(data_sets_splits["test"][i])
 
     return data_sets_splits
 
@@ -216,7 +242,7 @@ def _train_fin_bert(repo_name, tokenized_dataset, tokenizer, data_collator):
 
     model = _load_fin_bert()
 
-    epochs = 2
+    epochs = 3
     learning_rate = 2e-5
     batch_size = 8
     weight_decay = 0.01
