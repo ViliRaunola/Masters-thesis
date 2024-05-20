@@ -1,12 +1,12 @@
 # Analyzing Reddit posts using FinBert
 
-Link to publication: _____
+[Link to publication](https://urn.fi/URN:NBN:fi-fe2024052032981)
 
 This program is an MVP to test out the possibilities of using ML in analyzing Finnish social media conversations. It can analyze any Reddit post which has a valid link. The output of the program is an analysis of the post's title, contents and comments. The sentiment and NER tags are identified. One of the output files includes the combination of these two that highlights the most frequent NER tags with the sentiment of the context from which the NER tag was found. Using this information one can get an overall idea of the conversation that happened in the post.
 
 ## Demo
 
-Link to a demo video: ?
+Link to a demo video: coming soon?
 
 
 ## Manual
